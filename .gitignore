@@ -3,7 +3,6 @@
 *.sonarj
 *.sw*
 .DS_Store
-build.sh
 integration-repo
 ivy-cache
 argfile*
@@ -91,4 +90,10 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
-application-lsmin.yml
+# JUnit settings
+.run/
+
+
+### instant ignore setting ###
+# Environment Variables
+.env.*
