@@ -1,13 +1,13 @@
-package knu.univ.klock;
+package knu.univ.cse.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class KlockApplication {
+public class CseApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(KlockApplication.class, args);
+		SpringApplication.run(CseApplication.class, args);
 	}
 
 }

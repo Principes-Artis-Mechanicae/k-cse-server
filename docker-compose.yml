@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: k-lock-server
+    container_name: k-cse-server
     environment:
       - SPRING_PORT=${SPRING_PORT}
       - DB_HOST=${DB_HOST}
@@ -20,11 +20,12 @@ services:
     restart: always
 
   database:
-    image: postgres:latest
-    container_name: k-lock-database
+    image: mysql:latest
+    container_name: k-cse-database
     environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     command: -p ${DB_PORT}
     expose:
       - ${DB_PORT}
@@ -32,7 +33,7 @@ services:
       - ${DB_PORT}:${DB_PORT}
     restart: always
     volumes:
-      - k-lock-database:/var/lib/postgresql/data
+      - k-cse-database:/var/lib/mysql/data
 
 volumes:
-  k-lock-database:
+  k-cse-database:

@@ -1,10 +1,10 @@
-package knu.univ.klock;
+package knu.univ.cse.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 // @SpringBootTest
-class KlockApplicationTests {
+class CseApplicationTests {
 
 	@Test
 	void contextLoads() {

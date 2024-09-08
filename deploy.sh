@@ -37,6 +37,7 @@ check_env_file() {
 
 source_env_file() {
   if [ -f "$ENV_FILE" ]; then
+    # shellcheck disable=SC1090
     source "$ENV_FILE"
     echo "deploy.sh: Environment variables from $ENV_FILE:"
   else
