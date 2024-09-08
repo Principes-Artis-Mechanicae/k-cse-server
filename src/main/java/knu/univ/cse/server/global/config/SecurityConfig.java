@@ -49,9 +49,13 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		httpSecurity
-			.oauth2Login((oauth2) -> oauth2
-				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(principalOauth2UserService))
-				.successHandler(oauth2SuccessHandler));
+			.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+					.userService(principalOauth2UserService))
+				.successHandler(oauth2SuccessHandler)
+				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
+					.baseUri("/oauth2/authorize"))
+			);
 		return httpSecurity.build();
 	}
 
