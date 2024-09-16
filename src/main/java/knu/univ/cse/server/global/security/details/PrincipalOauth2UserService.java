@@ -6,8 +6,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import knu.univ.cse.server.domain.student.entity.OAuth2UserInfo;
-import knu.univ.cse.server.domain.student.service.StudentService;
+import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.security.dto.Oauth2ResponseDto;
 import knu.univ.cse.server.global.security.dto.Oauth2ResponseMatcher;
 import lombok.RequiredArgsConstructor;

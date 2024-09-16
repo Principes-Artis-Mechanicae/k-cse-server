@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import knu.univ.cse.server.domain.student.service.StudentService;
+import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.jwt.provider.JwtTokenValidator;
 import knu.univ.cse.server.global.security.details.PrincipalOauth2UserService;
 import knu.univ.cse.server.global.security.filter.JwtAuthorizationFilter;

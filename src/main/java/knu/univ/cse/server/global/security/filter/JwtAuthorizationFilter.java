@@ -11,7 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import knu.univ.cse.server.domain.student.service.StudentService;
+import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.jwt.provider.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
 

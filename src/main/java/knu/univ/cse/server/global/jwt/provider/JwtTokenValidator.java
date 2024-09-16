@@ -21,8 +21,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import knu.univ.cse.server.domain.student.entity.OAuth2UserInfo;
-import knu.univ.cse.server.domain.student.service.StudentService;
+import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.security.details.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 

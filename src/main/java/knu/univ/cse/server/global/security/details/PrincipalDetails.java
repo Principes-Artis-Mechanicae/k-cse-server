@@ -9,9 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import knu.univ.cse.server.domain.student.entity.OAuth2UserInfo;
-import knu.univ.cse.server.domain.student.entity.Student;
-import knu.univ.cse.server.domain.student.service.StudentService;
+import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.Student;
+import knu.univ.cse.server.domain.service.student.StudentService;
 import lombok.Builder;
 import lombok.Getter;
 
