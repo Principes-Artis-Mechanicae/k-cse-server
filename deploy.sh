@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Constants
+SUBMODULE_DIR="k-cse-server-module"
 DEVELOP_ENV_FILE=".env.develop"
 RELEASE_ENV_FILE=".env.release"
 
@@ -22,8 +23,8 @@ select_build_type() {
   read -p "Choice build type: " build_type
 
   case $build_type in
-    1) ENV_FILE="$DEVELOP_ENV_FILE" ;;
-    2) ENV_FILE="$RELEASE_ENV_FILE" && exit 1 ;;
+    1) ENV_FILE="$SUBMODULE_DIR/$DEVELOP_ENV_FILE" ;;
+    2) ENV_FILE="$SUBMODULE_DIR/$RELEASE_ENV_FILE" && exit 1 ;;
     *) echo "deploy.sh: Invalid choice. Exiting script." && exit 1 ;;
   esac
 }
@@ -48,8 +49,8 @@ source_env_file() {
 
 
 # Main script execution
-DEV_VERSION=$(get_version "$DEVELOP_ENV_FILE")
-REL_VERSION=$(get_version "$RELEASE_ENV_FILE")
+DEV_VERSION=$(get_version "$SUBMODULE_DIR/$DEVELOP_ENV_FILE")
+REL_VERSION=$(get_version "$SUBMODULE_DIR/$RELEASE_ENV_FILE")
 select_build_type
 check_env_file
 source_env_file
