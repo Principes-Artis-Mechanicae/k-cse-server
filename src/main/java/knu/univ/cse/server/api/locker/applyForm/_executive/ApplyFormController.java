@@ -1,4 +1,4 @@
-package knu.univ.cse.server.api.locker.applyForm;
+package knu.univ.cse.server.api.locker.applyForm._executive;
 
 import java.util.List;
 
@@ -25,11 +25,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/forms")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 public class ApplyFormController {
 	private final ApplyFormService applyFormService;
 
 	@PostMapping
-	@PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> createForm(
 		@RequestBody ApplyFormCreateDto requestBody
 	) {
@@ -40,7 +40,6 @@ public class ApplyFormController {
 	}
 
 	@PutMapping("/{year}/{semester}")
-	@PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> updateForm(
 		@PathVariable Integer year,
 		@PathVariable Integer semester,
@@ -53,7 +52,6 @@ public class ApplyFormController {
 	}
 
 	@DeleteMapping("/{year}/{semester}")
-	@PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 	public ResponseEntity<ApiUtil.ApiSuccessResult<Void>> deleteForm(
 		@PathVariable Integer year,
 		@PathVariable Integer semester
@@ -65,7 +63,6 @@ public class ApplyFormController {
 	}
 
 	@GetMapping
-	@PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 	public ResponseEntity<ApiSuccessResult<List<ApplyFormReadDto>>> getAllForms() {
 		List<ApplyFormReadDto> forms = applyFormService.getAllApplyForms();
 		return ResponseEntity
@@ -74,7 +71,6 @@ public class ApplyFormController {
 	}
 
 	@GetMapping("/{year}/{semester}")
-	@PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> getFormByYearAndSemester(
 		@PathVariable Integer year,
 		@PathVariable Integer semester
