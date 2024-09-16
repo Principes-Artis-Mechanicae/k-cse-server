@@ -24,8 +24,8 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
-		Oauth2ResponseDto oauth2Response = oauth2ResponseMatcher.matcher(registrationId, oAuth2User);
 
+		Oauth2ResponseDto oauth2Response = oauth2ResponseMatcher.matcher(registrationId, oAuth2User);
 		OAuth2UserInfo oAuth2UserInfo = studentService.saveOrReadOauth2UserInfo(oauth2Response);
 
 		return PrincipalDetails.buildPrincipalDetails(studentService, oAuth2UserInfo, oAuth2User);

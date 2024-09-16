@@ -11,4 +11,15 @@ public class CustomAssert {
 				.build();
 		}
 	}
+
+	public static <T> void found(T entity, Class<T> clazz) {
+		if (entity == null) {
+			throw CustomException.builder()
+				.status(HttpStatus.NOT_FOUND)
+				.message("Duplicate Found " + clazz.getSimpleName())
+				.build();
+		}
+	}
+
+
 }

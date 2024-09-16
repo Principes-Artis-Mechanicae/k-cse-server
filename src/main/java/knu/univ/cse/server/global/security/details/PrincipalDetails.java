@@ -37,7 +37,7 @@ public class PrincipalDetails implements OAuth2User {
 
     @Override
     public String getName() {
-        return student.getName();
+        return student.getStudentName();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PrincipalDetails implements OAuth2User {
         return PrincipalDetails.builder()
             .student(student)
             .oAuth2UserInfo(oAuth2UserInfo)
-            .attributes(oAuth2User.getAttributes())
+            .attributes(oAuth2User != null ? oAuth2User.getAttributes() : null)
             .build();
     }
 }

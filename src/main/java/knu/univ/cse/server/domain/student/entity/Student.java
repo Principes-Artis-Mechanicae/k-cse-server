@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Student {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "student_id")
     private Long id;
 
     @Column(
@@ -35,7 +35,7 @@ public class Student {
         name = "name",
         length = 50
     )
-    private String name;
+    private String studentName;
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
@@ -46,19 +46,19 @@ public class Student {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private OAuth2UserInfo oAuth2UserInfo;
+    private OAuth2UserInfo oAuth2UserInfo; // Fetch Type: Eager
 
     @OneToOne(
         mappedBy = "student",
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private Dues dues;
+    private Dues dues; // Fetch Type: Eager
 
     @Builder
-    public Student(String studentNumber, String name, Role role, OAuth2UserInfo oAuth2UserInfo, Dues dues) {
+    public Student(String studentNumber, String studentName, Role role, OAuth2UserInfo oAuth2UserInfo, Dues dues) {
         this.studentNumber = studentNumber;
-        this.name = name;
+        this.studentName = studentName;
         this.role = role;
         this.oAuth2UserInfo = oAuth2UserInfo;
         this.dues = dues;

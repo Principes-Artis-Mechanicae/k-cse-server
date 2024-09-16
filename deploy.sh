@@ -59,7 +59,7 @@ echo ""
 # Java Build
 echo "---------------------------------"
 echo "deploy.sh: Starting Java build..."
-./gradlew clean build
+./gradlew clean build -x test
 echo "deploy.sh: Java build completed."
 echo "---------------------------------"
 

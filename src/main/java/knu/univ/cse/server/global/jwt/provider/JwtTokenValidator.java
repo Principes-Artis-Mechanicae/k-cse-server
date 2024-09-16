@@ -29,13 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtTokenValidator {
-	private static final String AUTHORITIES_KEY = "auth";
-
+	private final String AUTHORITIES_KEY;
 	private final Key key;
 
-	public JwtTokenValidator(@Value("${spring.jwt.secret}") String secretKey) {
+	public JwtTokenValidator(
+		@Value("${spring.jwt.secret}") String secretKey,
+		@Value("${spring.jwt.authorities_key}") String authoritiesKey
+	) {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(keyBytes);
+		this.AUTHORITIES_KEY = authoritiesKey;
 	}
 
 	public Authentication getAuthentication(String accessToken, StudentService studentService) {

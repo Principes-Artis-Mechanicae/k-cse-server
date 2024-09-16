@@ -17,6 +17,22 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
 
+  jwt:
+    secret: ${JWT_SECRET}
+    authorities_key: auth
+    bearer-type: Bearer
+    access-token-expire-time: 864000000 # 10 days in milliseconds
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
+            scope: email, profile
+
 logging:
   level:
     org:

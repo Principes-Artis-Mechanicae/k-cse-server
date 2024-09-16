@@ -13,6 +13,8 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - database
     ports:
@@ -20,20 +22,21 @@ services:
     restart: always
 
   database:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: k-cse-database
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    command: -p ${DB_PORT}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    command: --port ${DB_PORT}
     expose:
       - ${DB_PORT}
     ports:
       - ${DB_PORT}:${DB_PORT}
     restart: always
     volumes:
-      - k-cse-database:/var/lib/mysql/data
+      - k-cse-database:/var/lib/mysql
 
 volumes:
   k-cse-database:
