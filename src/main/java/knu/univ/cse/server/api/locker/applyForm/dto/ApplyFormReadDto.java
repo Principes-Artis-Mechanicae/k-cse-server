@@ -1,4 +1,4 @@
-package knu.univ.cse.server.domain.dto.response;
+package knu.univ.cse.server.api.locker.applyForm.dto;
 
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyFormStatus;

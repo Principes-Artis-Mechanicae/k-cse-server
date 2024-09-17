@@ -1,4 +1,4 @@
-package knu.univ.cse.server.domain.dto.request;
+package knu.univ.cse.server.api.locker.applyForm.dto;
 
 import lombok.Builder;
 

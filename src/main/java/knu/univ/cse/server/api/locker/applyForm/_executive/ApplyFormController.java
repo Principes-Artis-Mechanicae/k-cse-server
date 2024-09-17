@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import knu.univ.cse.server.domain.dto.request.ApplyFormCreateDto;
-import knu.univ.cse.server.domain.dto.request.ApplyFormUpdateDto;
-import knu.univ.cse.server.domain.dto.response.ApplyFormReadDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
 import knu.univ.cse.server.domain.service.locker.applyForm.ApplyFormService;
 import knu.univ.cse.server.global.util.ApiUtil;
 import knu.univ.cse.server.global.util.ApiUtil.ApiSuccessResult;
 import lombok.RequiredArgsConstructor;
 
-@RestController
+@RestController("executiveApplyFormController")
 @RequestMapping("/forms")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
@@ -83,11 +83,11 @@ public class ApplyFormController {
 	}
 
 	@PatchMapping("/{year}/{semester}")
-	public ResponseEntity<ApiSuccessResult<String>> updateFormStatus(
+	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> updateFormStatus(
 		@PathVariable Integer year,
 		@PathVariable Integer semester
 	) {
-		ApplyFormReadDto updatedForm = applyFormService.updateApplyFormStatus(year, semester, requestBody);
+		ApplyFormReadDto updatedForm = applyFormService.updateApplyFormStatus(year, semester);
 		return ResponseEntity
 			.status(HttpStatus.OK)
 			.body(ApiUtil.success(HttpStatus.OK, updatedForm));

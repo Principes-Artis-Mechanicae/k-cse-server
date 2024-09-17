@@ -6,17 +6,15 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import knu.univ.cse.server.domain.dto.request.ApplyFormCreateDto;
-import knu.univ.cse.server.domain.dto.request.ApplyFormUpdateDto;
-import knu.univ.cse.server.domain.dto.response.ApplyFormReadDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
 import knu.univ.cse.server.domain.exception.locker.ApplyFormDuplicatedException;
 import knu.univ.cse.server.domain.exception.locker.ApplyFormNotFoundException;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyFormStatus;
 import knu.univ.cse.server.domain.persistence.ApplyFormRepository;
 import knu.univ.cse.server.domain.persistence.StudentRepository;
-import knu.univ.cse.server.global.exception.ErrorCode;
-import knu.univ.cse.server.global.exception.support.DuplicatedException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -84,18 +82,38 @@ public class ApplyFormService {
 	}
 
 	@Transactional
-	public String updateApplyFormStatus(Integer year, Integer semester) {
+	public ApplyFormReadDto updateApplyFormStatus(Integer year, Integer semester) {
 		/* Check if the student exists */
 		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)
 			.orElseThrow(ApplyFormNotFoundException::new);
 
 		/* Update the apply entity */
-		applyForm.updateStatus(
-			applyForm.getStatus() == ApplyFormStatus.ACTIVE ? ApplyFormStatus.INACTIVE : ApplyFormStatus.ACTIVE
-		);
+		if (applyForm.getStatus() == ApplyFormStatus.INACTIVE) {
+			if (isActiveApplyForm())
+				throw new ApplyFormDuplicatedException();
+			applyForm.updateStatus(ApplyFormStatus.ACTIVE);
+		} else {
+			applyForm.updateStatus(ApplyFormStatus.INACTIVE);
+		}
+
 		applyFormRepository.save(applyForm);
 
 		/* Return the updated apply entity */
-		// return ApplyFormReadDto.fromEntity(applyForm);
+		return ApplyFormReadDto.fromEntity(applyForm);
 	}
+
+
+	private boolean isActiveApplyForm() {
+		long activeCount = applyFormRepository.countByStatus(ApplyFormStatus.ACTIVE);
+		return activeCount == 1;
+	}
+
+	private ApplyForm getActiveApplyForm() {
+		if (!isActiveApplyForm())
+			throw new ApplyFormDuplicatedException();
+		return applyFormRepository.findByStatus(ApplyFormStatus.ACTIVE)
+			.orElseThrow(ApplyFormNotFoundException::new);
+	}
+
+
 }

@@ -1,8 +1,12 @@
 package knu.univ.cse.server.domain.service.student;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import knu.univ.cse.server.domain.exception.student.OAuth2UserInfoNotFoundException;
+import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
 import knu.univ.cse.server.domain.model.student.Student;
 import knu.univ.cse.server.domain.persistence.OAuth2UserInfoRepository;
@@ -18,10 +22,10 @@ public class StudentService {
 
     @Transactional
     public OAuth2UserInfo saveOrReadOauth2UserInfo(Oauth2ResponseDto responseDto) {
-        if (oAuth2UserInfoRepository.existsByEmail(responseDto.getEmail()))
-            return oAuth2UserInfoRepository.findByEmail(responseDto.getEmail());
-        else
-            return saveOauth2UserInfo(responseDto);
+        Optional<OAuth2UserInfo> oAuth2UserInfoOptional =
+            oAuth2UserInfoRepository.findByEmail(responseDto.getEmail());
+		return oAuth2UserInfoOptional.orElseGet(() ->
+            oAuth2UserInfoRepository.save(responseDto.toEntity()));
     }
 
     public boolean isOAuth2UserInfoConnectedToStudent(OAuth2UserInfo oAuth2UserInfo) {
@@ -29,24 +33,12 @@ public class StudentService {
     }
 
     public OAuth2UserInfo findOAuth2UserInfoByEmail(String email) {
-        OAuth2UserInfo oAuth2UserInfo = oAuth2UserInfoRepository.findByEmail(email);
-        CustomAssert.notFound(oAuth2UserInfo, OAuth2UserInfo.class);
-        return oAuth2UserInfo;
+		return oAuth2UserInfoRepository.findByEmail(email)
+            .orElseThrow(OAuth2UserInfoNotFoundException::new);
     }
 
     public Student findStudentByOAuth2UserInfo(OAuth2UserInfo oAuth2UserInfo) {
-        Student student = studentRepository.findStudentById(oAuth2UserInfo.getId());
-        CustomAssert.notFound(student, Student.class);
-        return student;
-    }
-
-    private OAuth2UserInfo saveOauth2UserInfo(Oauth2ResponseDto responseDto) {
-        return oAuth2UserInfoRepository.save(
-            OAuth2UserInfo.builder()
-                .email(responseDto.getEmail())
-                .provider(responseDto.getProvider())
-                .providerId(responseDto.getProviderId())
-                .build()
-        );
+        return studentRepository.findStudentById(oAuth2UserInfo.getId())
+            .orElseThrow(StudentNotFoundException::new);
     }
 }

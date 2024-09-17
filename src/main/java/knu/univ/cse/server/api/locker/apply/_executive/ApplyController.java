@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-@RestController
+@RestController("executiveApplyController")
 @RequestMapping("/apply")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")

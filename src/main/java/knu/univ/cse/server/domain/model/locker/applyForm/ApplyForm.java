@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import knu.univ.cse.server.domain.dto.request.ApplyFormUpdateDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.global.util.DateTimeUtil;
 import lombok.AccessLevel;
 import lombok.Builder;

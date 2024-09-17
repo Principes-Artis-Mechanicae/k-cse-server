@@ -3,8 +3,9 @@ package knu.univ.cse.server.domain.service.locker.apply;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import knu.univ.cse.server.domain.dto.request.ApplyCreateDto;
-import knu.univ.cse.server.domain.dto.response.ApplyReadDto;
+import knu.univ.cse.server.api.locker.apply.dto.ApplyCreateDto;
+import knu.univ.cse.server.api.locker.apply.dto.ApplyReadDto;
+import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.persistence.ApplyRepository;
 import knu.univ.cse.server.domain.model.student.Student;
@@ -24,9 +25,9 @@ public class ApplyService {
 	@Transactional
 	public ApplyReadDto createApply(ApplyCreateDto createDto) {
 		/* Check if the student exists */
-		Student student = studentRepository.findByStudentNameAndStudentNumber(
-			createDto.studentName(), createDto.studentNumber());
-		CustomAssert.notFound(student, Student.class);
+		Student student = studentRepository
+			.findByStudentNameAndStudentNumber(createDto.studentName(), createDto.studentNumber())
+			.orElseThrow(StudentNotFoundException::new);
 
 		/* Save the apply entity */
 		Apply apply = applyRepository.save(createDto.toEntity(student));
