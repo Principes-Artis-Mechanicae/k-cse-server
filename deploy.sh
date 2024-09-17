@@ -9,6 +9,7 @@ RELEASE_ENV_FILE=".env.release"
 DEV_VERSION=""
 REL_VERSION=""
 ENV_FILE=""
+IS_DEV_BUILD=false
 
 # Functions
 get_version() {
@@ -23,9 +24,17 @@ select_build_type() {
   read -p "Choice build type: " build_type
 
   case $build_type in
-    1) ENV_FILE="$SUBMODULE_DIR/$DEVELOP_ENV_FILE" ;;
-    2) ENV_FILE="$SUBMODULE_DIR/$RELEASE_ENV_FILE" && exit 1 ;;
-    *) echo "deploy.sh: Invalid choice. Exiting script." && exit 1 ;;
+    1)
+       ENV_FILE="$SUBMODULE_DIR/$DEVELOP_ENV_FILE"
+       IS_DEV_BUILD=true
+       ;;
+    2)
+       ENV_FILE="$SUBMODULE_DIR/$RELEASE_ENV_FILE"
+       IS_DEV_BUILD=false
+       ;;
+    *)
+       echo "deploy.sh: Invalid choice. Exiting script." && exit 1
+       ;;
   esac
 }
 
@@ -47,7 +56,6 @@ source_env_file() {
   fi
 }
 
-
 # Main script execution
 DEV_VERSION=$(get_version "$SUBMODULE_DIR/$DEVELOP_ENV_FILE")
 REL_VERSION=$(get_version "$SUBMODULE_DIR/$RELEASE_ENV_FILE")
@@ -60,7 +68,13 @@ echo ""
 # Java Build
 echo "---------------------------------"
 echo "deploy.sh: Starting Java build..."
-./gradlew clean build -x test
+
+if [ "$IS_DEV_BUILD" = true ]; then
+  ./gradlew clean build
+else
+  ./gradlew clean build -x test
+fi
+
 echo "deploy.sh: Java build completed."
 echo "---------------------------------"
 

@@ -102,6 +102,10 @@ public class ApplyFormService {
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
+	public ApplyFormReadDto getNowApplyForm() {
+		ApplyForm applyForm = getActiveApplyForm();
+		return ApplyFormReadDto.fromEntity(applyForm);
+	}
 
 	private boolean isActiveApplyForm() {
 		long activeCount = applyFormRepository.countByStatus(ApplyFormStatus.ACTIVE);
@@ -110,7 +114,7 @@ public class ApplyFormService {
 
 	private ApplyForm getActiveApplyForm() {
 		if (!isActiveApplyForm())
-			throw new ApplyFormDuplicatedException();
+			throw new ApplyFormNotFoundException();
 		return applyFormRepository.findByStatus(ApplyFormStatus.ACTIVE)
 			.orElseThrow(ApplyFormNotFoundException::new);
 	}
