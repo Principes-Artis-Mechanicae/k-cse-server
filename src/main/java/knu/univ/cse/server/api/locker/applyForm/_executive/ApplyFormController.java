@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
-import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.domain.service.locker.applyForm.ApplyFormService;
 import knu.univ.cse.server.global.util.ApiUtil;
 import knu.univ.cse.server.global.util.ApiUtil.ApiSuccessResult;
 import lombok.RequiredArgsConstructor;
 
-@RestController("executiveApplyFormController")
+@RestController("ExecutiveApplyFormController")
 @RequestMapping("/forms")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")

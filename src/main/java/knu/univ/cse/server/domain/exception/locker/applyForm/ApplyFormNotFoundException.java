@@ -1,4 +1,4 @@
-package knu.univ.cse.server.domain.exception.locker;
+package knu.univ.cse.server.domain.exception.locker.applyForm;
 
 import knu.univ.cse.server.global.exception.support.NotFoundException;
 

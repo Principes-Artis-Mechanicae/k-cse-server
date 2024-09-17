@@ -48,12 +48,16 @@ public class Apply extends BaseTimeEntity {
 	private Integer secondHeight;
 
 	@Enumerated(EnumType.STRING)
+	@Column(name = "period")
+	private ApplyPeriod period;
+
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
 	private ApplyStatus status;
 
 	@Builder
 	public Apply(Long id, Student student, ApplyForm applyForm, LockerFloor firstFloor, Integer firstHeight,
-		LockerFloor secondFloor, Integer secondHeight, ApplyStatus status) {
+		LockerFloor secondFloor, Integer secondHeight, ApplyPeriod period, ApplyStatus status) {
 		this.id = id;
 		this.student = student;
 		this.applyForm = applyForm;
@@ -61,6 +65,7 @@ public class Apply extends BaseTimeEntity {
 		this.firstHeight = firstHeight;
 		this.secondFloor = secondFloor;
 		this.secondHeight = secondHeight;
+		this.period = period;
 		this.status = status;
 	}
 

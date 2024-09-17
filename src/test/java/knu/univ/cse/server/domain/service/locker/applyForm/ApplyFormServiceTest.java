@@ -17,8 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
-import knu.univ.cse.server.domain.exception.locker.ApplyFormDuplicatedException;
-import knu.univ.cse.server.domain.exception.locker.ApplyFormNotFoundException;
+import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormDuplicatedException;
+import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormNotFoundException;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyFormStatus;
 import knu.univ.cse.server.domain.persistence.ApplyFormRepository;
@@ -63,9 +63,7 @@ public class ApplyFormServiceTest {
 		when(applyFormRepository.existsByYearAndSemester(2023, 1)).thenReturn(true);
 
 		// When & Then
-		assertThrows(ApplyFormDuplicatedException.class, () -> {
-			applyFormService.createApplyForm(requestBody);
-		});
+		assertThrows(ApplyFormDuplicatedException.class, () -> applyFormService.createApplyForm(requestBody));
 		verify(applyFormRepository, never()).save(any(ApplyForm.class));
 	}
 
@@ -115,9 +113,7 @@ public class ApplyFormServiceTest {
 		when(applyFormRepository.findByYearAndSemester(year, semester)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThrows(ApplyFormNotFoundException.class, () -> {
-			applyFormService.updateApplyForm(year, semester, requestBody);
-		});
+		assertThrows(ApplyFormNotFoundException.class, () -> applyFormService.updateApplyForm(year, semester, requestBody));
 		verify(applyFormRepository, never()).save(any(ApplyForm.class));
 	}
 
@@ -147,9 +143,7 @@ public class ApplyFormServiceTest {
 		when(applyFormRepository.findByYearAndSemester(year, semester)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThrows(ApplyFormNotFoundException.class, () -> {
-			applyFormService.deleteApplyForm(year, semester);
-		});
+		assertThrows(ApplyFormNotFoundException.class, () -> applyFormService.deleteApplyForm(year, semester));
 		verify(applyFormRepository, never()).delete(any(ApplyForm.class));
 	}
 
@@ -187,9 +181,7 @@ public class ApplyFormServiceTest {
 		when(applyFormRepository.findByYearAndSemester(year, semester)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThrows(ApplyFormNotFoundException.class, () -> {
-			applyFormService.getApplyForm(year, semester);
-		});
+		assertThrows(ApplyFormNotFoundException.class, () -> applyFormService.getApplyForm(year, semester));
 	}
 
 	@Test
@@ -288,9 +280,7 @@ public class ApplyFormServiceTest {
 		when(applyFormRepository.countByStatus(ApplyFormStatus.ACTIVE)).thenReturn(1L);
 
 		// When & Then
-		assertThrows(ApplyFormDuplicatedException.class, () -> {
-			applyFormService.updateApplyFormStatus(year, semester);
-		});
+		assertThrows(ApplyFormDuplicatedException.class, () -> applyFormService.updateApplyFormStatus(year, semester));
 		verify(applyFormRepository, never()).save(any(ApplyForm.class));
 	}
 }

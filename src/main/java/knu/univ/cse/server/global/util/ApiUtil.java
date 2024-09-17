@@ -4,9 +4,6 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import knu.univ.cse.server.global.exception.ErrorCode;
-import lombok.Builder;
-
 public class ApiUtil {
 
     public static <T> ApiSuccessResult<T> success(HttpStatus httpStatus) {

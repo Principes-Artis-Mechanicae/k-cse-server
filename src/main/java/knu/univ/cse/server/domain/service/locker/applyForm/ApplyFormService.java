@@ -7,14 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
-import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
-import knu.univ.cse.server.domain.exception.locker.ApplyFormDuplicatedException;
-import knu.univ.cse.server.domain.exception.locker.ApplyFormNotFoundException;
+import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
+import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormDuplicatedException;
+import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormNotFoundException;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyFormStatus;
 import knu.univ.cse.server.domain.persistence.ApplyFormRepository;
-import knu.univ.cse.server.domain.persistence.StudentRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -104,12 +103,12 @@ public class ApplyFormService {
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
-	private boolean isActiveApplyForm() {
+	public boolean isActiveApplyForm() {
 		long activeCount = applyFormRepository.countByStatus(ApplyFormStatus.ACTIVE);
 		return activeCount == 1;
 	}
 
-	private ApplyForm getActiveApplyForm() {
+	public ApplyForm getActiveApplyForm() {
 		if (!isActiveApplyForm())
 			throw new ApplyFormNotFoundException();
 		return applyFormRepository.findByStatus(ApplyFormStatus.ACTIVE)
