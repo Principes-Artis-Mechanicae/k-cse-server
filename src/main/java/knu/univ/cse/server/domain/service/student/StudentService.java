@@ -7,7 +7,6 @@ import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
 import knu.univ.cse.server.domain.model.student.Student;
 import knu.univ.cse.server.domain.persistence.OAuth2UserInfoRepository;
 import knu.univ.cse.server.domain.persistence.StudentRepository;
-import knu.univ.cse.server.global.exception.CustomAssert;
 import knu.univ.cse.server.global.security.dto.Oauth2ResponseDto;
 import lombok.RequiredArgsConstructor;
 

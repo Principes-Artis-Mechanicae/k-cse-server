@@ -1,13 +1,14 @@
 package knu.univ.cse.server.domain.dto.request;
 
+import knu.univ.cse.server.domain.model.locker.LockerFloor;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.apply.ApplyStatus;
 import knu.univ.cse.server.domain.model.student.Student;
 
 public record ApplyCreateDto(
 	String studentName, String studentNumber,
-	String firstFloor, String firstHeight,
-	String secondFloor, String secondHeight
+	LockerFloor firstFloor, Integer firstHeight,
+	LockerFloor secondFloor, Integer secondHeight
 ) {
 	public Apply toEntity(Student student) {
 		return Apply.builder()

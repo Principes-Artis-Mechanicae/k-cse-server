@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import knu.univ.cse.server.domain.model.base.BaseTimeEntity;
+import knu.univ.cse.server.domain.model.locker.LockerFloor;
+import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.student.Student;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,27 +31,32 @@ public class Apply extends BaseTimeEntity {
 	@JoinColumn(name = "student_id")
 	private Student student;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "apply_form_id")
+	private ApplyForm applyForm;
+
 	@Column(name = "first_floor", length = 5)
-	private String firstFloor;
+	private LockerFloor firstFloor;
 
 	@Column(name = "first_height", length = 5)
-	private String firstHeight;
+	private Integer firstHeight;
 
 	@Column(name = "second_floor", length = 5)
-	private String secondFloor;
+	private LockerFloor secondFloor;
 
 	@Column(name = "second_height", length = 5)
-	private String secondHeight;
+	private Integer secondHeight;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
 	private ApplyStatus status;
 
 	@Builder
-	public Apply(Long id, Student student, String firstFloor, String firstHeight, String secondFloor,
-		String secondHeight, ApplyStatus status) {
+	public Apply(Long id, Student student, ApplyForm applyForm, LockerFloor firstFloor, Integer firstHeight,
+		LockerFloor secondFloor, Integer secondHeight, ApplyStatus status) {
 		this.id = id;
 		this.student = student;
+		this.applyForm = applyForm;
 		this.firstFloor = firstFloor;
 		this.firstHeight = firstHeight;
 		this.secondFloor = secondFloor;

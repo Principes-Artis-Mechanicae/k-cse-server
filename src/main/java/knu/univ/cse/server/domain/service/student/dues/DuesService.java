@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.domain.model.student.dues.Dues;
 import knu.univ.cse.server.domain.persistence.DuesRepository;
-import knu.univ.cse.server.global.exception.CustomAssert;
 import lombok.RequiredArgsConstructor;
 
 @Service

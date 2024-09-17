@@ -9,7 +9,6 @@ import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.persistence.ApplyRepository;
 import knu.univ.cse.server.domain.model.student.Student;
 import knu.univ.cse.server.domain.persistence.StudentRepository;
-import knu.univ.cse.server.global.exception.CustomAssert;
 import lombok.RequiredArgsConstructor;
 
 @Service

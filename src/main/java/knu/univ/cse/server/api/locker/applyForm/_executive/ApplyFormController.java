@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -79,5 +80,16 @@ public class ApplyFormController {
 		return ResponseEntity
 			.status(HttpStatus.OK)
 			.body(ApiUtil.success(HttpStatus.OK, form));
+	}
+
+	@PatchMapping("/{year}/{semester}")
+	public ResponseEntity<ApiSuccessResult<String>> updateFormStatus(
+		@PathVariable Integer year,
+		@PathVariable Integer semester
+	) {
+		ApplyFormReadDto updatedForm = applyFormService.updateApplyFormStatus(year, semester, requestBody);
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.body(ApiUtil.success(HttpStatus.OK, updatedForm));
 	}
 }

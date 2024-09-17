@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import knu.univ.cse.server.global.exception.ErrorCode;
+import lombok.Builder;
+
 public class ApiUtil {
 
     public static <T> ApiSuccessResult<T> success(HttpStatus httpStatus) {
@@ -14,8 +17,8 @@ public class ApiUtil {
         return new ApiSuccessResult<>(httpStatus.value(), response);
     }
 
-    public static ApiErrorResult error(HttpStatus status, String message) {
-        return new ApiErrorResult(status.value(), message);
+    public static ApiErrorResult error(HttpStatus status, String code) {
+        return new ApiErrorResult(status.value(), code);
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,7 +26,7 @@ public class ApiUtil {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record ApiErrorResult(int status, String message) {
+    public record ApiErrorResult(int status, String code) {
     }
 
 }
