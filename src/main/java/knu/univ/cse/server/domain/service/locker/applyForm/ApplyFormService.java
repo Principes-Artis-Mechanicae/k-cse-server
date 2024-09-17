@@ -24,9 +24,6 @@ public class ApplyFormService {
 	/* internal dependency */
 	private final ApplyFormRepository applyFormRepository;
 
-	/* external dependency */
-	private final StudentRepository studentRepository;
-
 	@Transactional
 	public ApplyFormReadDto createApplyForm(ApplyFormCreateDto requestBody) {
 		/* Check if the student not exists */
@@ -118,6 +115,4 @@ public class ApplyFormService {
 		return applyFormRepository.findByStatus(ApplyFormStatus.ACTIVE)
 			.orElseThrow(ApplyFormNotFoundException::new);
 	}
-
-
 }

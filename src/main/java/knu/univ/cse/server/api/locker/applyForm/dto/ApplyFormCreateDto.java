@@ -13,8 +13,8 @@ public record ApplyFormCreateDto(
 		return ApplyForm.builder()
 			.year(year)
 			.semester(semester)
-			.firstApplyStartDate(DateTimeUtil.stringToLocalDateTime(firstApplyEndDate))
-			.firstApplyEndDate(DateTimeUtil.stringToLocalDateTime(firstApplyStartDate))
+			.firstApplyStartDate(DateTimeUtil.stringToLocalDateTime(firstApplyStartDate))
+			.firstApplyEndDate(DateTimeUtil.stringToLocalDateTime(firstApplyEndDate))
 			.semesterEndDate(DateTimeUtil.stringToLocalDateTime(semesterEndDate))
 			.status(ApplyFormStatus.INACTIVE)
 			.build();

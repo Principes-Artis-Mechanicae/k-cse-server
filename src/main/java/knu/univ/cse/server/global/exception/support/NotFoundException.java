@@ -2,7 +2,6 @@ package knu.univ.cse.server.global.exception.support;
 
 import org.springframework.http.HttpStatus;
 
-import knu.univ.cse.server.global.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter

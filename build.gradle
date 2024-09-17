@@ -23,6 +23,25 @@ repositories {
 	mavenCentral()
 }
 
+test {
+	testLogging {
+		events "started", "passed", "skipped", "failed"
+		exceptionFormat "full"
+		showStandardStreams = true
+
+		afterTest { descriptor, result ->
+			def testResult = result.resultType
+			if (testResult == TestResult.ResultType.SUCCESS) {
+				println "\u001B[32m✔ 테스트 성공: ${descriptor.parent.displayName} > ${descriptor.displayName}\u001B[0m"
+			} else if (testResult == TestResult.ResultType.FAILURE) {
+				println "\u001B[31m✖ 테스트 실패: ${descriptor.parent.displayName} > ${descriptor.displayName}\u001B[0m"
+			} else if (testResult == TestResult.ResultType.SKIPPED) {
+				println "\u001B[33m- 테스트 스킵됨: ${descriptor.parent.displayName} > ${descriptor.displayName}\u001B[0m"
+			}
+		}
+	}
+}
+
 dependencies {
 	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
