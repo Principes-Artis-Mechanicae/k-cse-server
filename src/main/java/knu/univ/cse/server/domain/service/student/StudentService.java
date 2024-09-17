@@ -46,4 +46,9 @@ public class StudentService {
         return studentRepository.findByStudentNameAndStudentNumber(studentName, studentNumber)
             .orElseThrow(StudentNotFoundException::new);
     }
+
+    public Student findStudentByStudentNumber(String studentNumber) {
+        return studentRepository.findByStudentNumber(studentNumber)
+            .orElseThrow(StudentNotFoundException::new);
+    }
 }

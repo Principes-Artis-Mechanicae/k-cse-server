@@ -124,4 +124,17 @@ public class ApplyService {
 			createDto.studentNumber()
 		);
 	}
+
+	/**
+	 * Retrieves the application by the student number.
+	 *
+	 * @param studentNumber The student number to search for.
+	 * @return The DTO representing the application.
+	 */
+	public ApplyReadDto getApplyByStudentNumber(String studentNumber) {
+		Student student = studentService.findStudentByStudentNumber(studentNumber);
+		Apply apply = applyRepository.findByStudent(student)
+			.orElseThrow(ApplyNotFoundException::new);
+		return ApplyReadDto.fromEntity(apply, student);
+	}
 }

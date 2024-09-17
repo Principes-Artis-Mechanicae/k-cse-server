@@ -4,12 +4,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@RestController("ExecutiveApplyController")
+@RestController
 @RequestMapping("/apply")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
-public class ApplyController {
+@Tag(name = "Executive Apply", description = "집행부가 사용하는 신청 API 입니다.")
+public class ApplyExecutiveController {
 
 }
