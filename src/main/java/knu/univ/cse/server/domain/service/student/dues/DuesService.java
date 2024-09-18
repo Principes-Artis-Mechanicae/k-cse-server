@@ -1,6 +1,7 @@
 package knu.univ.cse.server.domain.service.student.dues;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.domain.exception.student.dues.DuesNotFoundException;
@@ -22,7 +23,7 @@ public class DuesService {
 	 * @param isDues 학생회비 납부 여부
 	 * @throws DuesNotFoundException "DUES_NOT_FOUND"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public void updateDues(Long studentId, boolean isDues) {
 		if (duesRepository.existsDuesById(studentId)) {
 			Dues dues = duesRepository.findDuesById(studentId)

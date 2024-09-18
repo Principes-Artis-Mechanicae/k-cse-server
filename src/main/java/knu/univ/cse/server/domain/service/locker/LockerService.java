@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.domain.exception.locker.LockerFullNotFoundException;
@@ -28,6 +29,7 @@ public class LockerService {
 	 * @return 조회된 사물함 엔티티
 	 * @throws LockerNotFoundException "LOCKER_NOT_FOUND"
 	 */
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public Locker getLockerByLockerName(String lockerName, ApplyForm applyForm) {
 		return lockerRepository.findAvailableLockerByLockerName(lockerName, applyForm)
 			.orElseThrow(LockerNotFoundException::new);
@@ -40,6 +42,7 @@ public class LockerService {
 	 * @return 할당된 사물함 엔티티
 	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
 	 */
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public Locker getRandomLocker(Apply apply) {
 		List<Locker> lockers = getLockerByApplyWithoutAllocate(apply, apply.getApplyForm());
 		if (lockers.isEmpty()) throw new LockerFullNotFoundException();
@@ -57,6 +60,7 @@ public class LockerService {
 	 * @return 사용 가능한 사물함 리스트
 	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
 	 */
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	private List<Locker> getLockerByApplyWithoutAllocate(Apply apply, ApplyForm applyForm) {
 		List<Integer> firstLockerHeight = apply.getFirstHeight().getLockerHeight();
 		List<Locker> firstLockers = lockerRepository.findAvailableLockers(apply.getFirstFloor(), firstLockerHeight, applyForm);

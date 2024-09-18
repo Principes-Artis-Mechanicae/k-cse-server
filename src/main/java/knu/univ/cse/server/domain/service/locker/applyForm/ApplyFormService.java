@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
@@ -30,7 +31,7 @@ public class ApplyFormService {
 	 * @return 생성된 신청 폼을 나타내는 DTO
 	 * @throws ApplyFormDuplicatedException "APPLY_FORM_DUPLICATED"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public ApplyFormReadDto createApplyForm(ApplyFormCreateDto requestBody) {
 		/* Check if the student not exists */
 		if (applyFormRepository.existsByYearAndSemester(requestBody.year(), requestBody.semester()))
@@ -52,7 +53,7 @@ public class ApplyFormService {
 	 * @return 업데이트된 신청 폼을 나타내는 DTO
 	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public ApplyFormReadDto updateApplyForm(Integer year, Integer semester, ApplyFormUpdateDto requestBody) {
 		/* Check if the student exists */
 		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)
@@ -73,7 +74,7 @@ public class ApplyFormService {
 	 * @param semester 학기
 	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void deleteApplyForm(Integer year, Integer semester) {
 		/* Check if the student exists */
 		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)
@@ -121,7 +122,7 @@ public class ApplyFormService {
 	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
 	 * @throws ApplyFormDuplicatedException "APPLY_FORM_DUPLICATED"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public ApplyFormReadDto updateApplyFormStatus(Integer year, Integer semester) {
 		/* Check if the student exists */
 		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)

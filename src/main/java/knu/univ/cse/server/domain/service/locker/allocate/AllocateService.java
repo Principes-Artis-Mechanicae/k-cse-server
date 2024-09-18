@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.api.locker.allocate.dto.AllocateReadDto;
@@ -54,7 +55,7 @@ public class AllocateService {
 	 * @throws LockerNotFoundException "LOCKER_NOT_FOUND"
 	 * @throws AllocateDuplicatedException "ALLOCATE_DUPLICATED"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public AllocateReadDto allocateLockerByStudentNumber(String studentNumber, String lockerName) {
 		// 1. 학번으로 학생을 찾는다.
 		Student student = studentService.findStudentByStudentNumber(studentNumber);
@@ -96,7 +97,7 @@ public class AllocateService {
 	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
 	 * @throws AllocateDuplicatedException "ALLOCATE_DUPLICATED"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public AllocateReadDto allocateRandomLockerByStudentNumber(String studentNumber) {
 		// 1. 학번으로 학생을 찾는다.
 		Student student = studentService.findStudentByStudentNumber(studentNumber);
@@ -135,14 +136,7 @@ public class AllocateService {
 	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
 	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
 	 */
-	/**
-	 * 현재 활성화된 신청 폼의 모든 신청에 대해 랜덤 사물함을 할당합니다.
-	 *
-	 * @return 할당된 모든 사물함의 DTO 리스트
-	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
-	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
-	 */
-	@Transactional
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public List<AllocateReadDto> allocateAllLockers() {
 		// 1. 현재 활성화된 신청폼을 찾는다.
 		ApplyForm applyForm = applyFormService.getActiveApplyForm();

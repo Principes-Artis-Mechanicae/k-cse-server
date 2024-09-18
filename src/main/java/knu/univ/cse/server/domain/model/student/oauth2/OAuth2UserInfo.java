@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import knu.univ.cse.server.domain.model.student.Student;
 import lombok.AccessLevel;
@@ -18,6 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "oauth2_user_info", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class OAuth2UserInfo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
 import knu.univ.cse.server.domain.model.locker.Locker;
 import knu.univ.cse.server.domain.model.locker.LockerFloor;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
@@ -20,6 +21,7 @@ public interface LockerRepository extends JpaRepository<Locker, String> {
 	@Query("SELECT l FROM Locker l WHERE l.lockerName = :lockerName " +
 		"AND l.broken = false " +
 		"AND NOT EXISTS (SELECT 1 FROM Allocate a WHERE a.locker = l AND a.applyForm = :applyForm)")
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	Optional<Locker> findAvailableLockerByLockerName(
 		@Param("lockerName") String lockerName,
 		@Param("applyForm") ApplyForm applyForm

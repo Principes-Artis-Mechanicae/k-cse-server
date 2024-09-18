@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.global.util.DateTimeUtil;
 import lombok.AccessLevel;
@@ -17,6 +19,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "apply_form", uniqueConstraints = {
+	@UniqueConstraint(columnNames = {"year", "semester"})
+})
 public class ApplyForm {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "apply_form_id")

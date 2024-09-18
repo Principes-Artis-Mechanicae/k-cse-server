@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import knu.univ.cse.server.domain.model.student.dues.Dues;
 import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
 import lombok.AccessLevel;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "student")
 public class Student {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "student_id")

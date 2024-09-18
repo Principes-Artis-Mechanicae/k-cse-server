@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.api.locker.apply.dto.ApplyCreateDto;
@@ -48,7 +49,7 @@ public class ApplyService {
 	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
 	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public ApplyReadDto handlePrimaryApply(ApplyCreateDto createDto) {
 		return processApplication(createDto, ApplyPeriod.PRIMARY);
 	}
@@ -62,7 +63,7 @@ public class ApplyService {
 	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
 	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public ApplyReadDto handleAdditionalApply(ApplyCreateDto createDto) {
 		return processApplication(createDto, ApplyPeriod.ADDITIONAL);
 	}
@@ -77,7 +78,7 @@ public class ApplyService {
 	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
 	 */
-	@Transactional
+	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public ApplyReportReadDto handleReplacementApply(ApplyReportCreateDto createDto) {
 		ApplyReadDto applyReadDto = processApplication(createDto.apply(), ApplyPeriod.REPLACEMENT);
 		Report report = attachReport(createDto.content(), applyReadDto.applyId());

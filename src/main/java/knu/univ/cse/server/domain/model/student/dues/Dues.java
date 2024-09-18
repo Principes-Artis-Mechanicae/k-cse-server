@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import knu.univ.cse.server.domain.model.student.Student;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "dues")
 public class Dues {
 	@Id
 	private Long id;
