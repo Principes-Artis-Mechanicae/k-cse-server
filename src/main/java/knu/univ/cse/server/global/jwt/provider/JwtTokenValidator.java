@@ -21,7 +21,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.security.details.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +49,9 @@ public class JwtTokenValidator {
 
 		Collection<? extends GrantedAuthority> authorities = getAuthoritiesFromClaims(claims);
 
-		OAuth2UserInfo oAuth2UserInfo = studentService.findOAuth2UserInfoByEmail(claims.getSubject());
+		OAuthUserInfo oAuthUserInfo = studentService.findOAuth2UserInfoByEmail(claims.getSubject());
 		return new UsernamePasswordAuthenticationToken(
-			PrincipalDetails.buildPrincipalDetails(studentService, oAuth2UserInfo, null),
+			PrincipalDetails.buildPrincipalDetails(studentService, oAuthUserInfo, null),
 			"",
 			authorities
 		);

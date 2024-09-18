@@ -2,7 +2,7 @@ package knu.univ.cse.server.global.security.dto;
 
 import java.util.Map;
 
-import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 
 public class GoogleResponseDto implements Oauth2ResponseDto {
 
@@ -34,8 +34,8 @@ public class GoogleResponseDto implements Oauth2ResponseDto {
     }
 
     @Override
-    public OAuth2UserInfo toEntity() {
-        return OAuth2UserInfo.builder()
+    public OAuthUserInfo toEntity() {
+        return OAuthUserInfo.builder()
                 .email(getEmail())
                 .provider(getProvider())
                 .providerId(getProviderId())

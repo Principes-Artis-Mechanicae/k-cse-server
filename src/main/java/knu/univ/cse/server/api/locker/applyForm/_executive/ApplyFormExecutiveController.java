@@ -31,17 +31,16 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/forms")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
-@Tag(name = "Executive Apply Form", description = "집행부가 사용하는 신청 폼 관련 API 입니다.")
+@Tag(name = "신청 폼 관리 (집행부)", description = "집행부용 신청 폼 관리 API")
 public class ApplyFormExecutiveController {
 	private final ApplyFormService applyFormService;
 
-	@Operation(summary = "새로운 신청 폼 생성")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "신청 폼이 성공적으로 생성되었습니다."),
-		@ApiResponse(responseCode = "409", description = "신청 폼이 이미 존재합니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@PostMapping
+	@Operation(summary = "신청 폼 생성", description = "집행부는 새로운 신청 폼을 생성할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "신청 폼 생성 성공"),
+		@ApiResponse(responseCode = "409", description = "신청 폼이 이미 존재함 (code: APPLY_FORM_DUPLICATED)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> createForm(
 		@RequestBody ApplyFormCreateDto requestBody
 	) {
@@ -51,13 +50,12 @@ public class ApplyFormExecutiveController {
 			.body(ApiUtil.success(HttpStatus.CREATED, responseBody));
 	}
 
-	@Operation(summary = "기존 신청 폼 수정")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "신청 폼이 성공적으로 수정되었습니다."),
-		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@PutMapping("/{year}/{semester}")
+	@Operation(summary = "신청 폼 수정", description = "집행부는 특정 연도와 학기의 신청 폼을 수정할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "신청 폼 수정 성공"),
+		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없음 (code: APPLY_FORM_NOT_FOUND)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> updateForm(
 		@PathVariable Integer year,
 		@PathVariable Integer semester,
@@ -69,13 +67,12 @@ public class ApplyFormExecutiveController {
 			.body(ApiUtil.success(HttpStatus.OK, updatedForm));
 	}
 
-	@Operation(summary = "기존 신청 폼 삭제")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "204", description = "신청 폼이 성공적으로 삭제되었습니다."),
-		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@DeleteMapping("/{year}/{semester}")
+	@Operation(summary = "신청 폼 삭제", description = "집행부는 특정 연도와 학기의 신청 폼을 삭제할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "204", description = "신청 폼 삭제 성공"),
+		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없음 (code: APPLY_FORM_NOT_FOUND)")
+	})
 	public ResponseEntity<ApiSuccessResult<Void>> deleteForm(
 		@PathVariable Integer year,
 		@PathVariable Integer semester
@@ -86,12 +83,11 @@ public class ApplyFormExecutiveController {
 			.body(ApiUtil.success(HttpStatus.NO_CONTENT));
 	}
 
-	@Operation(summary = "모든 신청 폼 조회")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "신청 폼 목록을 성공적으로 조회했습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@GetMapping
+	@Operation(summary = "신청 폼 전체 조회", description = "집행부는 모든 신청 폼을 조회할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "신청 폼 조회 성공")
+	})
 	public ResponseEntity<ApiSuccessResult<List<ApplyFormReadDto>>> getAllForms() {
 		List<ApplyFormReadDto> forms = applyFormService.getAllApplyForms();
 		return ResponseEntity
@@ -99,13 +95,12 @@ public class ApplyFormExecutiveController {
 			.body(ApiUtil.success(HttpStatus.OK, forms));
 	}
 
-	@Operation(summary = "특정 연도 및 학기에 해당하는 신청 폼 조회")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "신청 폼을 성공적으로 조회했습니다."),
-		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@GetMapping("/{year}/{semester}")
+	@Operation(summary = "신청 폼 조회", description = "집행부는 특정 연도와 학기의 신청 폼을 조회할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "신청 폼 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없음 (code: APPLY_FORM_NOT_FOUND)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> getFormByYearAndSemester(
 		@PathVariable Integer year,
 		@PathVariable Integer semester
@@ -116,14 +111,13 @@ public class ApplyFormExecutiveController {
 			.body(ApiUtil.success(HttpStatus.OK, form));
 	}
 
-	@Operation(summary = "특정 연도 및 학기의 신청 폼 상태 수정")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "신청 폼 상태가 성공적으로 수정되었습니다."),
-		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "409", description = "다른 활성화된 신청 폼이 이미 존재합니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@PatchMapping("/{year}/{semester}")
+	@Operation(summary = "신청 폼 상태 변경", description = "집행부는 특정 연도와 학기의 신청 폼 상태를 변경할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "신청 폼 상태 변경 성공"),
+		@ApiResponse(responseCode = "404", description = "신청 폼을 찾을 수 없음 (code: APPLY_FORM_NOT_FOUND)"),
+		@ApiResponse(responseCode = "409", description = "이미 활성화된 신청 폼이 존재함 (code: APPLY_FORM_DUPLICATED)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> updateFormStatus(
 		@PathVariable Integer year,
 		@PathVariable Integer semester

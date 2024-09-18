@@ -27,17 +27,18 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/application")
 @RequiredArgsConstructor
 @PreAuthorize("permitAll()")
-@Tag(name = "Anonymous Apply", description = "익명 사용자가 사용하는 신청 API 입니다.")
+@Tag(name = "신청 (사용자)", description = "사용자용 신청 API")
 public class ApplyAnonymousController {
 	private final ApplyService applyService;
 
-	@Operation(summary = "1차 모집 신청 생성")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "1차 모집 신청이 성공적으로 제출되었습니다."),
-		@ApiResponse(responseCode = "409", description = "중복된 신청이 감지되었습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@PostMapping("/primary")
+	@Operation(summary = "1차 신청", description = "사용자는 현재 활성화된 신청 폼에 대해 1차 신청을 할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "신청 생성 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 신청 기간 (code: INVALID_APPLY_PERIOD)"),
+		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)"),
+		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyReadDto>> applyPrimary(
 		@RequestBody ApplyCreateDto requestBody
 	) {
@@ -47,13 +48,14 @@ public class ApplyAnonymousController {
 			.body(ApiUtil.success(HttpStatus.CREATED, responseBody));
 	}
 
-	@Operation(summary = "추가 모집 신청 생성")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "추가 모집 신청이 성공적으로 제출되었습니다."),
-		@ApiResponse(responseCode = "409", description = "중복된 신청이 감지되었습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@PostMapping("/additional")
+	@Operation(summary = "추가 신청", description = "사용자는 현재 활성화된 신청 폼에 대해 추가 신청을 할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "신청 생성 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 신청 기간 (code: INVALID_APPLY_PERIOD)"),
+		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)"),
+		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyReadDto>> applyAdditional(
 		@RequestBody ApplyCreateDto requestBody
 	) {
@@ -63,14 +65,14 @@ public class ApplyAnonymousController {
 			.body(ApiUtil.success(HttpStatus.CREATED, responseBody));
 	}
 
-	@Operation(summary = "교체 신청 및 보고서 제출")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "교체 신청이 성공적으로 제출되었습니다."),
-		@ApiResponse(responseCode = "409", description = "중복된 신청이 감지되었습니다."),
-		@ApiResponse(responseCode = "404", description = "관련 신청을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@PostMapping("/replacement")
+	@Operation(summary = "사물함 교체 신청 및 고장 신고", description = "사용자는 현재 활성화된 신청 폼에 대해 사물함 교체 신청과 고장 신고를 할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "신청 및 보고서 생성 성공"),
+		@ApiResponse(responseCode = "400", description = "잘못된 신청 기간 (code: INVALID_APPLY_PERIOD)"),
+		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)"),
+		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyReportReadDto>> applyReplacement(
 		@RequestBody ApplyReportCreateDto requestBody
 	) {
@@ -80,13 +82,13 @@ public class ApplyAnonymousController {
 			.body(ApiUtil.success(HttpStatus.CREATED, responseBody));
 	}
 
-	@Operation(summary = "학번으로 신청 조회")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "신청을 성공적으로 조회했습니다."),
-		@ApiResponse(responseCode = "404", description = "신청을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@GetMapping("/{studentNumber}")
+	@Operation(summary = "신청 조회", description = "사용자는 자신의 학번으로 신청 상태를 조회할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "신청 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "신청을 찾을 수 없음 (code: APPLY_NOT_FOUND)"),
+		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyReadDto>> getApply(
 		@PathVariable String studentNumber
 	) {

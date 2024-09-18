@@ -17,4 +17,9 @@ public interface ApplyRepository extends JpaRepository<Apply, Long> {
 	@EntityGraph(attributePaths = {"student"})
 	List<Apply> findAllByApplyFormAndStatus(ApplyForm applyForm, ApplyStatus status);
 	long countByStudentAndApplyFormAndStatus(Student student, ApplyForm applyForm, ApplyStatus status);
+
+	@EntityGraph(attributePaths = {"student"})
+	List<Apply> findAllByApplyForm(ApplyForm applyForm);
+
+	Optional<Apply> findByStudentAndApplyForm(Student student, ApplyForm applyForm);
 }

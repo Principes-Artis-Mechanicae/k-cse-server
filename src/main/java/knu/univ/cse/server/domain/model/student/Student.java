@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import knu.univ.cse.server.domain.model.student.dues.Dues;
-import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class Student {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private OAuth2UserInfo oAuth2UserInfo; // Fetch Type: Eager
+    private OAuthUserInfo oAuthUserInfo; // Fetch Type: Eager
 
     @OneToOne(
         mappedBy = "student",
@@ -59,11 +59,11 @@ public class Student {
     private Dues dues; // Fetch Type: Eager
 
     @Builder
-    public Student(String studentNumber, String studentName, Role role, OAuth2UserInfo oAuth2UserInfo, Dues dues) {
+    public Student(String studentNumber, String studentName, Role role, OAuthUserInfo oAuthUserInfo, Dues dues) {
         this.studentNumber = studentNumber;
         this.studentName = studentName;
         this.role = role;
-        this.oAuth2UserInfo = oAuth2UserInfo;
+        this.oAuthUserInfo = oAuthUserInfo;
         this.dues = dues;
     }
 }

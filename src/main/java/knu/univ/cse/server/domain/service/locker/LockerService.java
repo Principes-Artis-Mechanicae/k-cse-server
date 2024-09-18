@@ -61,7 +61,7 @@ public class LockerService {
 	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
 	 */
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
-	private List<Locker> getLockerByApplyWithoutAllocate(Apply apply, ApplyForm applyForm) {
+	public List<Locker> getLockerByApplyWithoutAllocate(Apply apply, ApplyForm applyForm) {
 		List<Integer> firstLockerHeight = apply.getFirstHeight().getLockerHeight();
 		List<Locker> firstLockers = lockerRepository.findAvailableLockers(apply.getFirstFloor(), firstLockerHeight, applyForm);
 		if (!firstLockers.isEmpty()) return firstLockers;

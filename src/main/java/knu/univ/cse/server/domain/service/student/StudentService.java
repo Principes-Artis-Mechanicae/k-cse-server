@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import knu.univ.cse.server.domain.exception.student.OAuth2UserInfoNotFoundException;
 import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.student.Student;
-import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 import knu.univ.cse.server.domain.persistence.OAuth2UserInfoRepository;
 import knu.univ.cse.server.domain.persistence.StudentRepository;
 import knu.univ.cse.server.global.security.dto.Oauth2ResponseDto;
@@ -28,8 +28,8 @@ public class StudentService {
      * @return 저장되었거나 기존의 OAuth2 사용자 정보 엔티티
      */
     @Transactional
-    public OAuth2UserInfo saveOrReadOauth2UserInfo(Oauth2ResponseDto responseDto) {
-        Optional<OAuth2UserInfo> oAuth2UserInfoOptional =
+    public OAuthUserInfo saveOrReadOauth2UserInfo(Oauth2ResponseDto responseDto) {
+        Optional<OAuthUserInfo> oAuth2UserInfoOptional =
             oAuth2UserInfoRepository.findByEmail(responseDto.getEmail());
         return oAuth2UserInfoOptional.orElseGet(() ->
             oAuth2UserInfoRepository.save(responseDto.toEntity()));
@@ -38,11 +38,11 @@ public class StudentService {
     /**
      * 주어진 OAuth2 사용자 정보가 학생과 연결되어 있는지 확인합니다.
      *
-     * @param oAuth2UserInfo OAuth2 사용자 정보 엔티티
+     * @param oAuthUserInfo OAuth2 사용자 정보 엔티티
      * @return 연결되어 있으면 true, 그렇지 않으면 false
      */
-    public boolean isOAuth2UserInfoConnectedToStudent(OAuth2UserInfo oAuth2UserInfo) {
-        return studentRepository.existsById(oAuth2UserInfo.getId());
+    public boolean isOAuth2UserInfoConnectedToStudent(OAuthUserInfo oAuthUserInfo) {
+        return studentRepository.existsById(oAuthUserInfo.getId());
     }
 
     /**
@@ -52,7 +52,7 @@ public class StudentService {
      * @return 해당 이메일의 OAuth2 사용자 정보 엔티티
      * @throws OAuth2UserInfoNotFoundException "OAUTH2_USER_INFO_NOT_FOUND"
      */
-    public OAuth2UserInfo findOAuth2UserInfoByEmail(String email) {
+    public OAuthUserInfo findOAuth2UserInfoByEmail(String email) {
         return oAuth2UserInfoRepository.findByEmail(email)
             .orElseThrow(OAuth2UserInfoNotFoundException::new);
     }
@@ -60,12 +60,12 @@ public class StudentService {
     /**
      * OAuth2 사용자 정보를 통해 학생을 조회합니다.
      *
-     * @param oAuth2UserInfo OAuth2 사용자 정보 엔티티
+     * @param oAuthUserInfo OAuth2 사용자 정보 엔티티
      * @return 해당 OAuth2 사용자 정보에 연결된 학생 엔티티
      * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
      */
-    public Student findStudentByOAuth2UserInfo(OAuth2UserInfo oAuth2UserInfo) {
-        return studentRepository.findStudentById(oAuth2UserInfo.getId())
+    public Student findStudentByOAuth2UserInfo(OAuthUserInfo oAuthUserInfo) {
+        return studentRepository.findStudentById(oAuthUserInfo.getId())
             .orElseThrow(StudentNotFoundException::new);
     }
 

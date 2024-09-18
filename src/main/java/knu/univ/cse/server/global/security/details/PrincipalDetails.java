@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import knu.univ.cse.server.domain.model.student.Student;
-import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,13 +18,13 @@ import lombok.Getter;
 @Getter
 public class PrincipalDetails implements OAuth2User {
     private final Student student;
-    private final OAuth2UserInfo oAuth2UserInfo;
+    private final OAuthUserInfo oAuthUserInfo;
     private final Map<String, Object> attributes;
 
     @Builder
-    public PrincipalDetails(Student student, OAuth2UserInfo oAuth2UserInfo, Map<String, Object> attributes) {
+    public PrincipalDetails(Student student, OAuthUserInfo oAuthUserInfo, Map<String, Object> attributes) {
         this.student = student;
-        this.oAuth2UserInfo = oAuth2UserInfo;
+        this.oAuthUserInfo = oAuthUserInfo;
         this.attributes = attributes;
     }
 
@@ -45,14 +45,14 @@ public class PrincipalDetails implements OAuth2User {
         return this.attributes;
     }
 
-    public static PrincipalDetails buildPrincipalDetails(StudentService studentService, OAuth2UserInfo oAuth2UserInfo, OAuth2User oAuth2User) {
-        Student student = studentService.isOAuth2UserInfoConnectedToStudent(oAuth2UserInfo)
-            ? studentService.findStudentByOAuth2UserInfo(oAuth2UserInfo)
+    public static PrincipalDetails buildPrincipalDetails(StudentService studentService, OAuthUserInfo oAuthUserInfo, OAuth2User oAuth2User) {
+        Student student = studentService.isOAuth2UserInfoConnectedToStudent(oAuthUserInfo)
+            ? studentService.findStudentByOAuth2UserInfo(oAuthUserInfo)
             : null;
 
         return PrincipalDetails.builder()
             .student(student)
-            .oAuth2UserInfo(oAuth2UserInfo)
+            .oAuthUserInfo(oAuthUserInfo)
             .attributes(oAuth2User != null ? oAuth2User.getAttributes() : null)
             .build();
     }

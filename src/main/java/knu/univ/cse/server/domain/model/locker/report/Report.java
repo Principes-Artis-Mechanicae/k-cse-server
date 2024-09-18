@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report {
 	@Id
-	@Column(name = "report_id")
+	@Column(name = "apply_form_id")
 	private Long id;
 
 	@MapsId

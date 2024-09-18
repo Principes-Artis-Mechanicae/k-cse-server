@@ -6,7 +6,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import knu.univ.cse.server.domain.model.student.oauth2.OAuth2UserInfo;
+import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.security.dto.Oauth2ResponseDto;
 import knu.univ.cse.server.global.security.dto.Oauth2ResponseMatcher;
@@ -26,8 +26,8 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
 		Oauth2ResponseDto oauth2Response = oauth2ResponseMatcher.matcher(registrationId, oAuth2User);
-		OAuth2UserInfo oAuth2UserInfo = studentService.saveOrReadOauth2UserInfo(oauth2Response);
+		OAuthUserInfo oAuthUserInfo = studentService.saveOrReadOauth2UserInfo(oauth2Response);
 
-		return PrincipalDetails.buildPrincipalDetails(studentService, oAuth2UserInfo, oAuth2User);
+		return PrincipalDetails.buildPrincipalDetails(studentService, oAuthUserInfo, oAuth2User);
 	}
 }

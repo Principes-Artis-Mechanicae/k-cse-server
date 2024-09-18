@@ -2,6 +2,7 @@ package knu.univ.cse.server.domain.service.locker.apply;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -11,9 +12,11 @@ import knu.univ.cse.server.api.locker.apply.dto.ApplyCreateDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReadDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportCreateDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportReadDto;
+import knu.univ.cse.server.api.locker.apply.dto.ApplyUpdateDto;
 import knu.univ.cse.server.domain.exception.locker.apply.ApplyDuplicatedException;
 import knu.univ.cse.server.domain.exception.locker.apply.ApplyNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.apply.InvalidApplyPeriodException;
+import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormNotFoundException;
 import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.apply.ApplyPeriod;
@@ -220,5 +223,116 @@ public class ApplyService {
 	 */
 	private Long countApplyWhenStatusIsApply(Student student, ApplyForm applyForm) {
 		return applyRepository.countByStudentAndApplyFormAndStatus(student, applyForm, ApplyStatus.APPLY);
+	}
+
+	public List<ApplyReadDto> getAppliesByYearAndSemester(Integer year, Integer semester) {
+		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		List<Apply> applies = applyRepository.findAllByApplyForm(applyForm);
+		return applies.stream()
+			.map(apply -> ApplyReadDto.fromEntity(apply, apply.getStudent()))
+			.collect(Collectors.toList());
+	}
+
+
+	// Throw 포함 javadocs
+
+	/**
+	 * 특정 년도와 학기, 상태에 해당하는 신청을 조회합니다.
+	 *
+	 * @param year 년도
+	 * @param semester 학기
+	 * @param status 신청 상태
+	 * @return 조회된 신청 리스트
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
+	public List<ApplyReadDto> getAppliesByYearSemesterAndStatus(Integer year, Integer semester, ApplyStatus status) {
+		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		List<Apply> applies = applyRepository.findAllByApplyFormAndStatus(applyForm, status);
+		return applies.stream()
+			.map(apply -> ApplyReadDto.fromEntity(apply, apply.getStudent()))
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 특정 학생의 신청을 업데이트합니다.
+	 *
+	 * @param year 년도
+	 * @param semester 학기
+	 * @param studentNumber 학생 학번
+	 * @param requestBody 업데이트할 신청 DTO
+	 * @return 업데이트된 신청을 나타내는 DTO
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
+	 */
+	@Transactional
+	public ApplyReadDto updateApplyByStudentNumber(Integer year, Integer semester, String studentNumber, ApplyUpdateDto requestBody) {
+		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		Student student = studentService.findStudentByStudentNumber(studentNumber);
+
+		Apply apply = applyRepository.findByStudentAndApplyForm(student, applyForm)
+			.orElseThrow(ApplyNotFoundException::new);
+
+		apply.update(requestBody);
+		applyRepository.save(apply);
+
+		return ApplyReadDto.fromEntity(apply, student);
+	}
+
+	/**
+	 * 특정 학생의 신청을 삭제합니다.
+	 *
+	 * @param year 년도
+	 * @param semester 학기
+	 * @param studentNumber 학생 학번
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
+	 */
+	@Transactional
+	public void deleteApplyByStudentNumber(Integer year, Integer semester, String studentNumber) {
+		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		Student student = studentService.findStudentByStudentNumber(studentNumber);
+
+		Apply apply = applyRepository.findByStudentAndApplyForm(student, applyForm)
+			.orElseThrow(ApplyNotFoundException::new);
+
+		applyRepository.delete(apply);
+	}
+
+	/**
+	 * 특정 신청을 업데이트합니다.
+	 *
+	 * @param applyId 신청 식별자
+	 * @param requestBody 업데이트할 신청 DTO
+	 * @return 업데이트된 신청을 나타내는 DTO
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 */
+	@Transactional
+	public ApplyReadDto updateApplyById(Long applyId, ApplyUpdateDto requestBody) {
+		Apply apply = getApplyById(applyId);
+
+		apply.update(requestBody);
+		applyRepository.save(apply);
+
+		return ApplyReadDto.fromEntity(apply, apply.getStudent());
+	}
+
+	/**
+	 * 특정 신청을 삭제합니다.
+	 *
+	 * @param applyId 신청 식별자
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 */
+	@Transactional
+	public void deleteApplyById(Long applyId) {
+		Apply apply = getApplyById(applyId);
+
+		applyRepository.delete(apply);
+	}
+
+	public Apply getApplyById(Long applyId) {
+		return applyRepository.findById(applyId)
+			.orElseThrow(ApplyNotFoundException::new);
 	}
 }

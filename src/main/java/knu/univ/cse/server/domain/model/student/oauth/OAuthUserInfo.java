@@ -1,4 +1,4 @@
-package knu.univ.cse.server.domain.model.student.oauth2;
+package knu.univ.cse.server.domain.model.student.oauth;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,11 +20,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "oauth2_user_info", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class OAuth2UserInfo {
+@Table(name = "oauth_user_info", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+public class OAuthUserInfo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "oauth2_user_info_id")
+    @Column(name = "oauth_user_info_id")
     private Long id;
 
     @Email
@@ -42,7 +42,7 @@ public class OAuth2UserInfo {
     private Student student;
 
     @Builder
-    public OAuth2UserInfo(Long id, String email, String provider, String providerId, Student student) {
+    public OAuthUserInfo(Long id, String email, String provider, String providerId, Student student) {
         this.id = id;
         this.email = email;
         this.provider = provider;

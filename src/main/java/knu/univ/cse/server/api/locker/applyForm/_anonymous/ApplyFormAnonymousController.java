@@ -21,17 +21,16 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/forms")
 @RequiredArgsConstructor
 @PreAuthorize("permitAll()")
-@Tag(name = "Anonymous Apply Form", description = "익명의 사용자가 사용하는 신청 폼 관련 API 입니다.")
+@Tag(name = "신청 폼 (사용자)", description = "사용자용 신청 폼 API")
 public class ApplyFormAnonymousController {
 	private final ApplyFormService applyFormService;
 
-	@Operation(summary = "현재 활성화된 신청 폼 조회")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "현재 신청 폼을 성공적으로 조회했습니다."),
-		@ApiResponse(responseCode = "404", description = "활성화된 신청 폼을 찾을 수 없습니다."),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
-	})
 	@GetMapping("/now")
+	@Operation(summary = "현재 신청 폼 조회", description = "사용자는 현재 활성화된 신청 폼을 조회할 수 있습니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "현재 신청 폼 조회 성공"),
+		@ApiResponse(responseCode = "404", description = "활성화된 신청 폼을 찾을 수 없음 (code: APPLY_FORM_NOT_FOUND)")
+	})
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> getNowForm() {
 		ApplyFormReadDto responseBody = applyFormService.getNowApplyForm();
 		return ResponseEntity

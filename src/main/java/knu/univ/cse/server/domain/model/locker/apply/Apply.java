@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import knu.univ.cse.server.api.locker.apply.dto.ApplyUpdateDto;
 import knu.univ.cse.server.domain.model.base.BaseTimeEntity;
 import knu.univ.cse.server.domain.model.locker.LockerFloor;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
@@ -73,5 +74,25 @@ public class Apply extends BaseTimeEntity {
 
 	public void updateStatus(ApplyStatus status) {
 		this.status = status;
+	}
+
+	public void update(ApplyUpdateDto applyUpdateDto) {
+		if (applyUpdateDto.firstFloor() != null)
+			this.firstFloor = applyUpdateDto.firstFloor();
+
+		if (applyUpdateDto.firstHeight() != null)
+			this.firstHeight = applyUpdateDto.firstHeight();
+
+		if (applyUpdateDto.secondFloor() != null)
+			this.secondFloor = applyUpdateDto.secondFloor();
+
+		if (applyUpdateDto.secondHeight() != null)
+			this.secondHeight = applyUpdateDto.secondHeight();
+
+		if (applyUpdateDto.period() != null)
+			this.period = applyUpdateDto.period();
+
+		if (applyUpdateDto.status() != null)
+			this.status = applyUpdateDto.status();
 	}
 }

@@ -94,8 +94,7 @@ public class ApplyFormService {
 	 */
 	public ApplyFormReadDto getApplyForm(Integer year, Integer semester) {
 		/* Check if the student exists */
-		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)
-			.orElseThrow(ApplyFormNotFoundException::new);
+		ApplyForm applyForm = getApplyFormByYearAndSemester(year, semester);
 
 		/* Return the apply entity */
 		return ApplyFormReadDto.fromEntity(applyForm);
@@ -174,6 +173,19 @@ public class ApplyFormService {
 		if (!isActiveApplyForm())
 			throw new ApplyFormNotFoundException();
 		return applyFormRepository.findByStatus(ApplyFormStatus.ACTIVE)
+			.orElseThrow(ApplyFormNotFoundException::new);
+	}
+
+	/**
+	 * 특정 연도와 학기의 신청 폼을 조회합니다.
+	 *
+	 * @param year 연도
+	 * @param semester 학기
+	 * @return 조회된 신청 폼 엔티티
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
+	public ApplyForm getApplyFormByYearAndSemester(Integer year, Integer semester) {
+		return applyFormRepository.findByYearAndSemester(year, semester)
 			.orElseThrow(ApplyFormNotFoundException::new);
 	}
 }
