@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# 상대 경로로 지정한 폴더를 첫 번째 인자로 받음
-folder_path=$1
-
 # 출력 파일 지정
-output_file="output2.txt"
+output_file="$1.code_output.txt"
+
+# 상대 경로로 지정한 폴더를 첫 번째 인자로 받음
+folder_path=$2
 
 # 기존에 존재하는 output.txt 파일 삭제 (있을 경우)
 if [ -f "$output_file" ]; then

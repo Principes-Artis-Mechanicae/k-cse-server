@@ -1,6 +1,7 @@
 package knu.univ.cse.server.domain.service.locker.apply;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,10 +10,13 @@ import knu.univ.cse.server.api.locker.apply.dto.ApplyCreateDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReadDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportCreateDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportReadDto;
+import knu.univ.cse.server.domain.exception.locker.apply.ApplyDuplicatedException;
 import knu.univ.cse.server.domain.exception.locker.apply.ApplyNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.apply.InvalidApplyPeriodException;
+import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.apply.ApplyPeriod;
+import knu.univ.cse.server.domain.model.locker.apply.ApplyStatus;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.report.Report;
 import knu.univ.cse.server.domain.model.student.Student;
@@ -36,10 +40,13 @@ public class ApplyService {
 	private final ReportService reportService;
 
 	/**
-	 * Handles the creation of a primary application.
+	 * 1차 신청을 처리합니다.
 	 *
-	 * @param createDto The DTO containing application details.
-	 * @return The DTO representing the created application.
+	 * @param createDto 신청 생성 DTO
+	 * @return 생성된 신청을 나타내는 DTO
+	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
+	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
 	@Transactional
 	public ApplyReadDto handlePrimaryApply(ApplyCreateDto createDto) {
@@ -47,10 +54,13 @@ public class ApplyService {
 	}
 
 	/**
-	 * Handles the creation of an additional application.
+	 * 추가 신청을 처리합니다.
 	 *
-	 * @param createDto The DTO containing application details.
-	 * @return The DTO representing the created application.
+	 * @param createDto 신청 생성 DTO
+	 * @return 생성된 신청을 나타내는 DTO
+	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
+	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
 	@Transactional
 	public ApplyReadDto handleAdditionalApply(ApplyCreateDto createDto) {
@@ -58,10 +68,14 @@ public class ApplyService {
 	}
 
 	/**
-	 * Handles the creation of a replacement application along with a report.
+	 * 교체 신청과 함께 고장신고를 처리합니다.
 	 *
-	 * @param createDto The DTO containing application and report details.
-	 * @return The DTO representing the created application.
+	 * @param createDto 교체 신청 및 보고서 생성 DTO
+	 * @return 생성된 신청과 보고서를 나타내는 DTO
+	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
+	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
 	 */
 	@Transactional
 	public ApplyReportReadDto handleReplacementApply(ApplyReportCreateDto createDto) {
@@ -71,27 +85,36 @@ public class ApplyService {
 	}
 
 	/**
-	 * Processes the application based on the specified period and report content.
+	 * 신청을 처리합니다.
 	 *
-	 * @param createDto    The DTO containing application details.
-	 * @param period       The period of the application.
-	 * @return The DTO representing the created application.
+	 * @param createDto 신청 생성 DTO
+	 * @param period 신청 기간
+	 * @return 생성된 신청을 나타내는 DTO
+	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
+	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
 	private ApplyReadDto processApplication(ApplyCreateDto createDto, ApplyPeriod period) {
 		ApplyForm activeApplyForm = applyFormService.getActiveApplyForm();
 		validateApplicationPeriod(activeApplyForm, period);
 
 		Student student = retrieveStudent(createDto);
+		if (countApplyWhenStatusIsApply(student, activeApplyForm) > 0) {
+			throw new ApplyDuplicatedException();
+		}
+
 		Apply apply = applyRepository.save(createDto.toEntity(student, period));
 
 		return ApplyReadDto.fromEntity(apply, student);
 	}
 
 	/**
-	 * Attaches a report to the specified application.
+	 * 보고서를 신청에 첨부합니다.
 	 *
-	 * @param content  The content of the report.
-	 * @param applyId The ID of the application to attach the report to.
+	 * @param content 보고서 내용
+	 * @param applyId 신청 식별자
+	 * @return 생성된 보고서 엔티티
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
 	 */
 	private Report attachReport(String content, Long applyId) {
 		Apply apply = applyRepository.findById(applyId)
@@ -100,10 +123,11 @@ public class ApplyService {
 	}
 
 	/**
-	 * Validates whether the current time is within the application period.
+	 * 신청 기간이 유효한지 검증합니다.
 	 *
-	 * @param applyForm The active application form.
-	 * @param period    The period of the application.
+	 * @param applyForm 활성화된 신청 폼
+	 * @param period 신청 기간
+	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
 	 */
 	private void validateApplicationPeriod(ApplyForm applyForm, ApplyPeriod period) {
 		LocalDateTime now = DateTimeUtil.now();
@@ -113,10 +137,11 @@ public class ApplyService {
 	}
 
 	/**
-	 * Retrieves the student based on the provided application details.
+	 * 신청 생성 DTO를 기반으로 학생을 조회합니다.
 	 *
-	 * @param createDto The DTO containing student details.
-	 * @return The Student entity.
+	 * @param createDto 신청 생성 DTO
+	 * @return 조회된 학생 엔티티
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
 	private Student retrieveStudent(ApplyCreateDto createDto) {
 		return studentService.findStudentByNameAndNumber(
@@ -126,15 +151,73 @@ public class ApplyService {
 	}
 
 	/**
-	 * Retrieves the application by the student number.
+	 * 학번을 통해 신청을 조회합니다.
 	 *
-	 * @param studentNumber The student number to search for.
-	 * @return The DTO representing the application.
+	 * @param studentNumber 학생 학번
+	 * @return 조회된 신청을 나타내는 DTO
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
 	 */
 	public ApplyReadDto getApplyByStudentNumber(String studentNumber) {
 		Student student = studentService.findStudentByStudentNumber(studentNumber);
 		Apply apply = applyRepository.findByStudent(student)
 			.orElseThrow(ApplyNotFoundException::new);
 		return ApplyReadDto.fromEntity(apply, student);
+	}
+
+	/**
+	 * 신청 상태를 업데이트합니다.
+	 *
+	 * @param apply 업데이트할 신청 엔티티
+	 * @param status 새로운 신청 상태
+	 */
+	@Transactional
+	public void updateApplyStatus(Apply apply, ApplyStatus status) {
+		apply.updateStatus(status);
+		applyRepository.save(apply);
+	}
+
+	/**
+	 * 학번과 신청 폼을 기반으로 신청을 조회합니다.
+	 *
+	 * @param student 학생 엔티티
+	 * @param applyForm 신청 폼 엔티티
+	 * @return 조회된 신청 엔티티
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
+	 */
+	public Apply getApplyByStudentNumberAndApplyFormWhenStatusIsApply(Student student, ApplyForm applyForm) {
+		if (countApplyWhenStatusIsApply(student, applyForm) == 0)
+			throw new ApplyNotFoundException();
+		else if (countApplyWhenStatusIsApply(student, applyForm) > 1)
+			throw new ApplyDuplicatedException();
+
+		return applyRepository.findByStudentAndApplyFormAndStatus(student, applyForm, ApplyStatus.APPLY)
+			.orElseThrow(ApplyNotFoundException::new);
+	}
+
+	/**
+	 * 신청 폼과 상태를 기반으로 모든 신청을 조회합니다.
+	 *
+	 * @param applyForm 신청 폼 엔티티
+	 * @param status 신청 상태
+	 * @return 조회된 신청 리스트
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 */
+	public List<Apply> getAppliesByApplyFormAndStatus(ApplyForm applyForm, ApplyStatus status) {
+		List<Apply> applies = applyRepository.findAllByApplyFormAndStatus(applyForm, status);
+		if (applies.isEmpty()) throw new ApplyNotFoundException();
+		return applies;
+	}
+
+	/**
+	 * 특정 학생과 신청 폼에 대한 APPLY 상태의 신청 수를 셉니다.
+	 *
+	 * @param student 학생 엔티티
+	 * @param applyForm 신청 폼 엔티티
+	 * @return APPLY 상태의 신청 수
+	 */
+	private Long countApplyWhenStatusIsApply(Student student, ApplyForm applyForm) {
+		return applyRepository.countByStudentAndApplyFormAndStatus(student, applyForm, ApplyStatus.APPLY);
 	}
 }

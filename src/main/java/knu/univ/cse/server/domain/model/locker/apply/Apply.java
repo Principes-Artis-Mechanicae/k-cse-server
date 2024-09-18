@@ -35,17 +35,17 @@ public class Apply extends BaseTimeEntity {
 	@JoinColumn(name = "apply_form_id")
 	private ApplyForm applyForm;
 
-	@Column(name = "first_floor", length = 5)
+	@Column(name = "first_floor")
 	private LockerFloor firstFloor;
 
-	@Column(name = "first_height", length = 5)
-	private Integer firstHeight;
+	@Column(name = "first_height")
+	private ApplyHeight firstHeight;
 
-	@Column(name = "second_floor", length = 5)
+	@Column(name = "second_floor")
 	private LockerFloor secondFloor;
 
-	@Column(name = "second_height", length = 5)
-	private Integer secondHeight;
+	@Column(name = "second_height")
+	private ApplyHeight secondHeight;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "period")
@@ -56,8 +56,8 @@ public class Apply extends BaseTimeEntity {
 	private ApplyStatus status;
 
 	@Builder
-	public Apply(Long id, Student student, ApplyForm applyForm, LockerFloor firstFloor, Integer firstHeight,
-		LockerFloor secondFloor, Integer secondHeight, ApplyPeriod period, ApplyStatus status) {
+	public Apply(Long id, Student student, ApplyForm applyForm, LockerFloor firstFloor, ApplyHeight firstHeight,
+		LockerFloor secondFloor, ApplyHeight secondHeight, ApplyPeriod period, ApplyStatus status) {
 		this.id = id;
 		this.student = student;
 		this.applyForm = applyForm;

@@ -22,7 +22,7 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtTokenGenerator jwtTokenGenerator;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         log.info("OAuth2 로그인 성공 1");
         PrincipalDetails oauth2User = (PrincipalDetails) authentication.getPrincipal();
         Token accessToken =  jwtTokenGenerator.generateAccessToken(authentication);

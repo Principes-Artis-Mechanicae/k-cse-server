@@ -15,11 +15,12 @@ public class DuesService {
 	private final DuesRepository duesRepository;
 
 	/**
-	 * 학생회비 납부 여부 설정
-	 * - 만약 해당 학생이 학생회비를 납부한 기록이 있다면, 해당 기록을 수정한다.
-	 * - 만약 해당 학생이 학생회비를 납부한 기록이 없다면, 새로운 기록을 생성한다.
+	 * 학생의 학생회비 납부 여부를 설정합니다.
+	 * - 학생회비 납부 기록이 있으면 수정하고, 없으면 새로 생성합니다.
+	 *
 	 * @param studentId 학생 식별자
 	 * @param isDues 학생회비 납부 여부
+	 * @throws DuesNotFoundException "DUES_NOT_FOUND"
 	 */
 	@Transactional
 	public void updateDues(Long studentId, boolean isDues) {
@@ -44,5 +45,11 @@ public class DuesService {
 				.dues(isDues)
 				.build()
 		);
+	}
+
+	public boolean isDues(Long studentId) {
+		return duesRepository.findDuesById(studentId)
+			.map(Dues::isDues)
+			.orElse(false);
 	}
 }

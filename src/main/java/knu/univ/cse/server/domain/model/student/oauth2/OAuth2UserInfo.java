@@ -25,7 +25,7 @@ public class OAuth2UserInfo {
     private Long id;
 
     @Email
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "provider")

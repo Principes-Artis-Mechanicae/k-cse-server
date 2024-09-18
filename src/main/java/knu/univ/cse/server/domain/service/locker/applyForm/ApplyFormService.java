@@ -23,6 +23,13 @@ public class ApplyFormService {
 	/* internal dependency */
 	private final ApplyFormRepository applyFormRepository;
 
+	/**
+	 * 새로운 신청 폼을 생성합니다.
+	 *
+	 * @param requestBody 신청 폼 생성 DTO
+	 * @return 생성된 신청 폼을 나타내는 DTO
+	 * @throws ApplyFormDuplicatedException "APPLY_FORM_DUPLICATED"
+	 */
 	@Transactional
 	public ApplyFormReadDto createApplyForm(ApplyFormCreateDto requestBody) {
 		/* Check if the student not exists */
@@ -36,7 +43,15 @@ public class ApplyFormService {
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
-
+	/**
+	 * 기존 신청 폼을 업데이트합니다.
+	 *
+	 * @param year 연도
+	 * @param semester 학기
+	 * @param requestBody 신청 폼 업데이트 DTO
+	 * @return 업데이트된 신청 폼을 나타내는 DTO
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
 	@Transactional
 	public ApplyFormReadDto updateApplyForm(Integer year, Integer semester, ApplyFormUpdateDto requestBody) {
 		/* Check if the student exists */
@@ -51,6 +66,13 @@ public class ApplyFormService {
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
+	/**
+	 * 특정 신청 폼을 삭제합니다.
+	 *
+	 * @param year 연도
+	 * @param semester 학기
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
 	@Transactional
 	public void deleteApplyForm(Integer year, Integer semester) {
 		/* Check if the student exists */
@@ -61,6 +83,14 @@ public class ApplyFormService {
 		applyFormRepository.delete(applyForm);
 	}
 
+	/**
+	 * 특정 신청 폼을 조회합니다.
+	 *
+	 * @param year 연도
+	 * @param semester 학기
+	 * @return 조회된 신청 폼을 나타내는 DTO
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
 	public ApplyFormReadDto getApplyForm(Integer year, Integer semester) {
 		/* Check if the student exists */
 		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)
@@ -70,6 +100,11 @@ public class ApplyFormService {
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
+	/**
+	 * 모든 신청 폼을 조회합니다.
+	 *
+	 * @return 모든 신청 폼의 DTO 리스트
+	 */
 	public List<ApplyFormReadDto> getAllApplyForms() {
 		/* Return the apply entities */
 		return applyFormRepository.findAll().stream()
@@ -77,6 +112,15 @@ public class ApplyFormService {
 			.collect(Collectors.toList());
 	}
 
+	/**
+	 * 특정 신청 폼의 상태를 업데이트합니다.
+	 *
+	 * @param year 연도
+	 * @param semester 학기
+	 * @return 업데이트된 신청 폼을 나타내는 DTO
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 * @throws ApplyFormDuplicatedException "APPLY_FORM_DUPLICATED"
+	 */
 	@Transactional
 	public ApplyFormReadDto updateApplyFormStatus(Integer year, Integer semester) {
 		/* Check if the student exists */
@@ -98,16 +142,33 @@ public class ApplyFormService {
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
+	/**
+	 * 현재 활성화된 신청 폼을 조회합니다.
+	 *
+	 * @return 현재 활성화된 신청 폼을 나타내는 DTO
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
 	public ApplyFormReadDto getNowApplyForm() {
 		ApplyForm applyForm = getActiveApplyForm();
 		return ApplyFormReadDto.fromEntity(applyForm);
 	}
 
+	/**
+	 * 활성화된 신청 폼이 있는지 확인합니다.
+	 *
+	 * @return 활성화된 신청 폼이 있으면 true, 없으면 false
+	 */
 	public boolean isActiveApplyForm() {
 		long activeCount = applyFormRepository.countByStatus(ApplyFormStatus.ACTIVE);
 		return activeCount == 1;
 	}
 
+	/**
+	 * 활성화된 신청 폼을 조회합니다.
+	 *
+	 * @return 활성화된 신청 폼 엔티티
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
 	public ApplyForm getActiveApplyForm() {
 		if (!isActiveApplyForm())
 			throw new ApplyFormNotFoundException();

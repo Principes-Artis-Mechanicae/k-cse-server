@@ -25,11 +25,15 @@ public class Locker {
 	@Column(name = "pw", length = 4, nullable = false)
 	private String pw;
 
+	@Column(name = "broken", nullable = false)
+	private Boolean broken;
+
 	@Builder
-	public Locker(String lockerName, LockerFloor floor, Integer height, String pw) {
+	public Locker(String lockerName, LockerFloor floor, Integer height, String pw, Boolean broken) {
 		this.lockerName = lockerName;
 		this.floor = floor;
 		this.height = height;
 		this.pw = pw;
+		this.broken = broken;
 	}
 }
