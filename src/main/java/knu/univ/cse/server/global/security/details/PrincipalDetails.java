@@ -31,13 +31,17 @@ public class PrincipalDetails implements OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(student.getRole().name()));
+        if (student != null && student.getRole() != null) {
+            authorities.add(new SimpleGrantedAuthority(student.getRole().name()));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
+        }
         return authorities;
     }
 
     @Override
     public String getName() {
-        return student.getStudentName();
+        return student != null ? student.getStudentName() : oAuthUserInfo.getEmail();
     }
 
     @Override
@@ -46,9 +50,10 @@ public class PrincipalDetails implements OAuth2User {
     }
 
     public static PrincipalDetails buildPrincipalDetails(StudentService studentService, OAuthUserInfo oAuthUserInfo, OAuth2User oAuth2User) {
-        Student student = studentService.isOAuth2UserInfoConnectedToStudent(oAuthUserInfo)
-            ? studentService.findStudentByOAuth2UserInfo(oAuthUserInfo)
-            : null;
+        Student student = null;
+        if (studentService.isOAuth2UserInfoConnectedToStudent(oAuthUserInfo)) {
+            student = studentService.findStudentByOAuth2UserInfo(oAuthUserInfo);
+        }
 
         return PrincipalDetails.builder()
             .student(student)

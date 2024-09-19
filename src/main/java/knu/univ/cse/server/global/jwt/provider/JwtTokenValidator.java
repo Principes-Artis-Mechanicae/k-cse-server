@@ -3,6 +3,7 @@ package knu.univ.cse.server.global.jwt.provider;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import knu.univ.cse.server.domain.exception.student.OAuth2UserInfoNotFoundException;
 import knu.univ.cse.server.domain.model.student.oauth.OAuthUserInfo;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.security.details.PrincipalDetails;
@@ -43,22 +45,29 @@ public class JwtTokenValidator {
 
 	public Authentication getAuthentication(String accessToken, StudentService studentService) {
 		Claims claims = parseClaims(accessToken);
-		if (claims.get(AUTHORITIES_KEY) == null) {
-			throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-		}
-
 		Collection<? extends GrantedAuthority> authorities = getAuthoritiesFromClaims(claims);
 
-		OAuthUserInfo oAuthUserInfo = studentService.findOAuth2UserInfoByEmail(claims.getSubject());
-		return new UsernamePasswordAuthenticationToken(
-			PrincipalDetails.buildPrincipalDetails(studentService, oAuthUserInfo, null),
-			"",
-			authorities
-		);
+		OAuthUserInfo oAuthUserInfo;
+		try {
+			oAuthUserInfo = studentService.findOAuth2UserInfoByEmail(claims.getSubject());
+		} catch (OAuth2UserInfoNotFoundException e) {
+			// Handle the case where OAuthUserInfo is not found
+			oAuthUserInfo = OAuthUserInfo.builder()
+				.email(claims.getSubject())
+				.build();
+		}
+
+		PrincipalDetails principalDetails = PrincipalDetails.buildPrincipalDetails(studentService, oAuthUserInfo, null);
+		return new UsernamePasswordAuthenticationToken(principalDetails, "", authorities);
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthoritiesFromClaims(Claims claims) {
-		return Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+		String authoritiesStr = claims.get(AUTHORITIES_KEY, String.class);
+		if (authoritiesStr == null || authoritiesStr.isEmpty()) {
+			return Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
+		}
+
+		return Arrays.stream(authoritiesStr.split(","))
 			.map(SimpleGrantedAuthority::new)
 			.collect(Collectors.toList());
 	}

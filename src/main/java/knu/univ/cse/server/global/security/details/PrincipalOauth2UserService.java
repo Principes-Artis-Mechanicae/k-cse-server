@@ -27,7 +27,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
 		Oauth2ResponseDto oauth2Response = oauth2ResponseMatcher.matcher(registrationId, oAuth2User);
 		OAuthUserInfo oAuthUserInfo = studentService.saveOrReadOauth2UserInfo(oauth2Response);
-
 		return PrincipalDetails.buildPrincipalDetails(studentService, oAuthUserInfo, oAuth2User);
 	}
 }

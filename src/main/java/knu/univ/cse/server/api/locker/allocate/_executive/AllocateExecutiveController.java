@@ -23,7 +23,7 @@ import knu.univ.cse.server.global.util.ApiUtil.ApiSuccessResult;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/apply")
+@RequestMapping("/applies")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 @Tag(name = "사물함 할당 (집행부)", description = "집행부용 사물함 할당 API")

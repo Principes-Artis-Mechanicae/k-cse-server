@@ -21,7 +21,6 @@ import knu.univ.cse.server.domain.model.locker.apply.ApplyStatus;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.student.Student;
 import knu.univ.cse.server.domain.persistence.AllocateRepository;
-import knu.univ.cse.server.domain.persistence.LockerRepository;
 import knu.univ.cse.server.domain.service.locker.LockerService;
 import knu.univ.cse.server.domain.service.locker.apply.ApplyService;
 import knu.univ.cse.server.domain.service.locker.applyForm.ApplyFormService;

@@ -32,6 +32,7 @@ public class SecurityConfig {
 	private final StudentService studentService;
 	private final PrincipalOauth2UserService principalOauth2UserService;
 	private final Oauth2SuccessHandler oauth2SuccessHandler;
+	private final CorsProperties corsProperties;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(
@@ -44,30 +45,32 @@ public class SecurityConfig {
 			.formLogin(AbstractHttpConfigurer::disable);
 
 		httpSecurity
-			.authorizeHttpRequests(request -> request.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+			.authorizeHttpRequests(request -> request
+				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+				.anyRequest().authenticated())
 			.addFilterBefore(new JwtAuthorizationFilter(studentService, jwtTokenValidator), UsernamePasswordAuthenticationFilter.class)
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		httpSecurity
 			.oauth2Login(oauth2 -> oauth2
-				.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+				.authorizationEndpoint(authorization -> authorization
+					.baseUri("/oauth2/authorize")) // OAuth2 인증 시작 URL 설정
+				.redirectionEndpoint(redirection -> redirection
+					.baseUri("/oauth2/callback/*")) // OAuth2 콜백 URL 설정
+				.userInfoEndpoint(userInfo -> userInfo
 					.userService(principalOauth2UserService))
-				.successHandler(oauth2SuccessHandler)
-				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
-					.baseUri("/oauth2/authorize"))
-			);
+				.successHandler(oauth2SuccessHandler)); // 인증 성공 핸들러
+
 		return httpSecurity.build();
 	}
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of(
-			"http://localhost:3000"
-		));
-		configuration.setAllowedMethods(List.of("*"));
-		configuration.setAllowCredentials(true);
-		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
+		configuration.setAllowedMethods(corsProperties.getAllowedMethods());
+		configuration.setAllowCredentials(corsProperties.isAllowCredentials());
+		configuration.setAllowedHeaders(List.of("*")); // You can make this configurable as well
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);

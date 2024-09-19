@@ -26,7 +26,7 @@ import knu.univ.cse.server.global.util.ApiUtil.ApiSuccessResult;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/apply")
+@RequestMapping("/application")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EXECUTIVE') and isAuthenticated()")
 @Tag(name = "신청 관리 (집행부)", description = "집행부용 신청 관리 API")

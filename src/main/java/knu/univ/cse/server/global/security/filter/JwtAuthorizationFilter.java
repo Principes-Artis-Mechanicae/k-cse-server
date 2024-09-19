@@ -14,7 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.jwt.provider.JwtTokenValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends GenericFilterBean {
     private final StudentService studentService;
@@ -33,10 +35,13 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
 
         String token = JwtTokenValidator.resolveToken(servletRequest);
         if (token != null && jwtTokenValidator.validateToken(token)) {
-            Authentication authentication
-                = jwtTokenValidator.getAuthentication(token, studentService);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                Authentication authentication = jwtTokenValidator.getAuthentication(token, studentService);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                // Log the exception and proceed without setting authentication
+                log.error("Authentication failed: {}", e.getMessage());
+            }
         }
 
         chain.doFilter(request, response);
