@@ -19,7 +19,7 @@ find "$folder_path" -type f -name "*.java" | while read java_file; do
   echo "$(basename "$java_file")" >> "$output_file"
 
   # 파일 내용 중 import 및 package 구문을 제외하고 출력
-  grep -Ev '^\s*(import|package)\s' "$java_file" >> "$output_file"
+  grep -Ev '^\s*(import)\s' "$java_file" >> "$output_file"
 
   # 파일 간에 구분을 위한 빈 줄 추가
   echo -e "\n" >> "$output_file"

@@ -30,7 +30,9 @@ import knu.univ.cse.server.domain.service.locker.report.ReportService;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor

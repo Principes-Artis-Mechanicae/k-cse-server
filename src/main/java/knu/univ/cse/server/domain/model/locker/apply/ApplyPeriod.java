@@ -10,9 +10,9 @@ public enum ApplyPeriod {
 		@Override
 		public boolean isWithinPeriod(ApplyForm applyForm, LocalDateTime currentTime) {
 			return DateTimeUtil.isBetweenInclusive(
+				currentTime,
 				applyForm.getFirstApplyStartDate(),
-				applyForm.getFirstApplyEndDate(),
-				currentTime
+				applyForm.getFirstApplyEndDate()
 			);
 		}
 	},
@@ -20,9 +20,9 @@ public enum ApplyPeriod {
 		@Override
 		public boolean isWithinPeriod(ApplyForm applyForm, LocalDateTime currentTime) {
 			return DateTimeUtil.isBetweenInclusive(
+				currentTime,
 				applyForm.getFirstApplyEndDate(),
-				applyForm.getSemesterEndDate(),
-				currentTime
+				applyForm.getSemesterEndDate()
 			);
 		}
 	},
@@ -30,9 +30,9 @@ public enum ApplyPeriod {
 		@Override
 		public boolean isWithinPeriod(ApplyForm applyForm, LocalDateTime currentTime) {
 			return DateTimeUtil.isBetweenInclusive(
+				currentTime,
 				applyForm.getFirstApplyEndDate(),
-				applyForm.getSemesterEndDate(),
-				currentTime
+				applyForm.getSemesterEndDate()
 			);
 		}
 	};
