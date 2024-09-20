@@ -1,5 +1,6 @@
 package knu.univ.cse.server.domain.service.locker.applyForm;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +13,12 @@ import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormDuplicatedException;
 import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormNotFoundException;
+import knu.univ.cse.server.domain.exception.locker.applyForm.InvalidApplyFormDateException;
+import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyFormStatus;
 import knu.univ.cse.server.domain.persistence.ApplyFormRepository;
+import knu.univ.cse.server.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,12 +34,16 @@ public class ApplyFormService {
 	 * @param requestBody 신청 폼 생성 DTO
 	 * @return 생성된 신청 폼을 나타내는 DTO
 	 * @throws ApplyFormDuplicatedException "APPLY_FORM_DUPLICATED"
+	 * @throws InvalidApplyFormDateException "INVALID_APPLY_FORM_DATE"
 	 */
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public ApplyFormReadDto createApplyForm(ApplyFormCreateDto requestBody) {
-		/* Check if the student not exists */
+		/* Check if the apply form already exists */
 		if (applyFormRepository.existsByYearAndSemester(requestBody.year(), requestBody.semester()))
 			throw new ApplyFormDuplicatedException();
+
+		/* Validate the dates */
+		validateApplyFormDates(requestBody);
 
 		/* Save the apply entity */
 		ApplyForm applyForm = applyFormRepository.save(requestBody.toEntity());
@@ -52,12 +60,18 @@ public class ApplyFormService {
 	 * @param requestBody 신청 폼 업데이트 DTO
 	 * @return 업데이트된 신청 폼을 나타내는 DTO
 	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 * @throws InvalidApplyFormDateException "INVALID_APPLY_FORM_DATE"
 	 */
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public ApplyFormReadDto updateApplyForm(Integer year, Integer semester, ApplyFormUpdateDto requestBody) {
-		/* Check if the student exists */
+		/* Check if the apply form exists */
 		ApplyForm applyForm = applyFormRepository.findByYearAndSemester(year, semester)
 			.orElseThrow(ApplyFormNotFoundException::new);
+
+		/* Validate the dates if they are being updated */
+		if (requestBody.firstApplyStartDate() != null && requestBody.firstApplyEndDate() != null && requestBody.semesterEndDate() != null) {
+			validateApplyFormDates(applyForm, requestBody);
+		}
 
 		/* Update the apply entity */
 		applyForm.update(requestBody);
@@ -187,5 +201,41 @@ public class ApplyFormService {
 	public ApplyForm getApplyFormByYearAndSemester(Integer year, Integer semester) {
 		return applyFormRepository.findByYearAndSemester(year, semester)
 			.orElseThrow(ApplyFormNotFoundException::new);
+	}
+
+	/**
+	 * 신청 폼의 날짜 유효성을 검증합니다.
+	 *
+	 * @param requestBody 신청 폼 생성 DTO
+	 * @throws InvalidApplyFormDateException "INVALID_APPLY_FORM_DATE"
+	 */
+	private void validateApplyFormDates(ApplyFormCreateDto requestBody) {
+		LocalDateTime firstStartDate = DateTimeUtil.stringToLocalDateTime(requestBody.firstApplyStartDate());
+		LocalDateTime firstEndDate = DateTimeUtil.stringToLocalDateTime(requestBody.firstApplyEndDate());
+		LocalDateTime semesterEndDate = DateTimeUtil.stringToLocalDateTime(requestBody.semesterEndDate());
+
+		if (!firstStartDate.isBefore(firstEndDate) || !firstEndDate.isBefore(semesterEndDate)) {
+			throw new InvalidApplyFormDateException();
+		}
+	}
+
+
+	/**
+	 * 신청 폼의 날짜 유효성을 검증합니다.
+	 *
+	 * @param requestBody 신청 폼 생성 DTO
+	 * @throws InvalidApplyFormDateException "INVALID_APPLY_FORM_DATE"
+	 */
+	private void validateApplyFormDates(ApplyForm applyForm, ApplyFormUpdateDto requestBody) {
+		LocalDateTime firstStartDate =
+			requestBody.firstApplyStartDate() == null ? applyForm.getFirstApplyStartDate() : DateTimeUtil.stringToLocalDateTime(requestBody.firstApplyStartDate());
+		LocalDateTime firstEndDate =
+			requestBody.firstApplyEndDate() == null ? applyForm.getFirstApplyEndDate() : DateTimeUtil.stringToLocalDateTime(requestBody.firstApplyEndDate());
+		LocalDateTime semesterEndDate =
+			requestBody.semesterEndDate() == null ? applyForm.getSemesterEndDate() : DateTimeUtil.stringToLocalDateTime(requestBody.semesterEndDate());
+
+		if (!firstStartDate.isBefore(firstEndDate) || !firstEndDate.isBefore(semesterEndDate)) {
+			throw new InvalidApplyFormDateException();
+		}
 	}
 }

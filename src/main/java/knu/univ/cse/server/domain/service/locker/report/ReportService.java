@@ -1,8 +1,12 @@
 package knu.univ.cse.server.domain.service.locker.report;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import knu.univ.cse.server.api.locker.apply.dto.ApplyReportReadDto;
+import knu.univ.cse.server.domain.exception.locker.report.ReportNotFoundException;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.report.Report;
 import knu.univ.cse.server.domain.persistence.ReportRepository;
@@ -28,5 +32,17 @@ public class ReportService {
 			.content(content)
 			.apply(apply)
 			.build());
+	}
+
+
+	/**
+	 * 모든 보고서를 조회합니다.
+	 *
+	 * @throws ReportNotFoundException "REPORT_NOT_FOUND"
+	 * @return 모든 보고서의 DTO 리스트
+	 */
+	public Report getReportByApply(Apply apply) {
+		return reportRepository.findByApply(apply)
+			.orElseThrow(ReportNotFoundException::new);
 	}
 }

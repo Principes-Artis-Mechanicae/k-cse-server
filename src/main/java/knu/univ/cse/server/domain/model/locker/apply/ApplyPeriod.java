@@ -31,7 +31,7 @@ public enum ApplyPeriod {
 		public boolean isWithinPeriod(ApplyForm applyForm, LocalDateTime currentTime) {
 			return DateTimeUtil.isBetweenInclusive(
 				currentTime,
-				applyForm.getFirstApplyEndDate(),
+				applyForm.getFirstApplyStartDate(),
 				applyForm.getSemesterEndDate()
 			);
 		}

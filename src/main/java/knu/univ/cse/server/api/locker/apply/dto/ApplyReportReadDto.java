@@ -5,10 +5,11 @@ import lombok.Builder;
 
 @Builder
 public record ApplyReportReadDto(
-	ApplyReadDto apply, String content
+	Long reportId, ApplyReadDto apply, String content
 ) {
 	public static ApplyReportReadDto of(ApplyReadDto apply, Report report) {
 		return ApplyReportReadDto.builder()
+			.reportId(report.getId())
 			.apply(apply)
 			.content(report.getContent())
 			.build();

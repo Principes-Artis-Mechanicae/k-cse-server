@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyCreateDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReadDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportCreateDto;
@@ -37,10 +38,11 @@ public class ApplyAnonymousController {
 		@ApiResponse(responseCode = "201", description = "신청 생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 신청 기간 (code: INVALID_APPLY_PERIOD)"),
 		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)"),
-		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)")
+		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)"),
+		@ApiResponse(responseCode = "400", description = "이미 배정 받은 사람이 신청함 (code: ALREADY_ALLOCATED)")
 	})
 	public ResponseEntity<ApiSuccessResult<ApplyReadDto>> applyPrimary(
-		@RequestBody ApplyCreateDto requestBody
+		@Valid @RequestBody ApplyCreateDto requestBody
 	) {
 		ApplyReadDto responseBody = applyService.handlePrimaryApply(requestBody);
 		return ResponseEntity
@@ -54,10 +56,11 @@ public class ApplyAnonymousController {
 		@ApiResponse(responseCode = "201", description = "신청 생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 신청 기간 (code: INVALID_APPLY_PERIOD)"),
 		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)"),
-		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)")
+		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)"),
+		@ApiResponse(responseCode = "400", description = "이미 배정 받은 사람이 신청함 (code: ALREADY_ALLOCATED)")
 	})
 	public ResponseEntity<ApiSuccessResult<ApplyReadDto>> applyAdditional(
-		@RequestBody ApplyCreateDto requestBody
+		@Valid @RequestBody ApplyCreateDto requestBody
 	) {
 		ApplyReadDto responseBody = applyService.handleAdditionalApply(requestBody);
 		return ResponseEntity
@@ -71,10 +74,11 @@ public class ApplyAnonymousController {
 		@ApiResponse(responseCode = "201", description = "신청 및 보고서 생성 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 신청 기간 (code: INVALID_APPLY_PERIOD)"),
 		@ApiResponse(responseCode = "404", description = "학생을 찾을 수 없음 (code: STUDENT_NOT_FOUND)"),
-		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)")
+		@ApiResponse(responseCode = "409", description = "이미 신청이 존재함 (code: APPLY_DUPLICATED)"),
+		@ApiResponse(responseCode = "404", description = "배정 받지 않은 사람이 신청함 (code: ALLOCATE_NOT_FOUND)")
 	})
 	public ResponseEntity<ApiSuccessResult<ApplyReportReadDto>> applyReplacement(
-		@RequestBody ApplyReportCreateDto requestBody
+		@Valid @RequestBody ApplyReportCreateDto requestBody
 	) {
 		ApplyReportReadDto responseBody = applyService.handleReplacementApply(requestBody);
 		return ResponseEntity

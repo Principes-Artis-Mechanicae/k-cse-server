@@ -13,10 +13,14 @@ import knu.univ.cse.server.api.locker.apply.dto.ApplyReadDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportCreateDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyReportReadDto;
 import knu.univ.cse.server.api.locker.apply.dto.ApplyUpdateDto;
+import knu.univ.cse.server.api.locker.apply.dto.ReportStatusUpdateDto;
+import knu.univ.cse.server.domain.exception.locker.allocate.AllocateNotFoundException;
+import knu.univ.cse.server.domain.exception.locker.allocate.AlreadyAllocatedException;
 import knu.univ.cse.server.domain.exception.locker.apply.ApplyDuplicatedException;
 import knu.univ.cse.server.domain.exception.locker.apply.ApplyNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.apply.InvalidApplyPeriodException;
 import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormNotFoundException;
+import knu.univ.cse.server.domain.exception.locker.report.ReportNotFoundException;
 import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.apply.ApplyPeriod;
@@ -24,6 +28,7 @@ import knu.univ.cse.server.domain.model.locker.apply.ApplyStatus;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.report.Report;
 import knu.univ.cse.server.domain.model.student.Student;
+import knu.univ.cse.server.domain.persistence.AllocateRepository;
 import knu.univ.cse.server.domain.persistence.ApplyRepository;
 import knu.univ.cse.server.domain.service.locker.applyForm.ApplyFormService;
 import knu.univ.cse.server.domain.service.locker.report.ReportService;
@@ -41,6 +46,7 @@ public class ApplyService {
 	private final ApplyRepository applyRepository;
 
 	/* External Dependencies */
+	private final AllocateRepository allocateRepository;
 	private final ApplyFormService applyFormService;
 	private final StudentService studentService;
 	private final ReportService reportService;
@@ -56,7 +62,7 @@ public class ApplyService {
 	 */
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public ApplyReadDto handlePrimaryApply(ApplyCreateDto createDto) {
-		return processApplication(createDto, ApplyPeriod.PRIMARY);
+		return processApplication(createDto, ApplyPeriod.PRIMARY, ApplyStatus.APPLY);
 	}
 
 	/**
@@ -70,7 +76,7 @@ public class ApplyService {
 	 */
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public ApplyReadDto handleAdditionalApply(ApplyCreateDto createDto) {
-		return processApplication(createDto, ApplyPeriod.ADDITIONAL);
+		return processApplication(createDto, ApplyPeriod.ADDITIONAL, ApplyStatus.APPLY);
 	}
 
 	/**
@@ -85,7 +91,7 @@ public class ApplyService {
 	 */
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public ApplyReportReadDto handleReplacementApply(ApplyReportCreateDto createDto) {
-		ApplyReadDto applyReadDto = processApplication(createDto.apply(), ApplyPeriod.REPLACEMENT);
+		ApplyReadDto applyReadDto = processApplication(createDto.apply(), ApplyPeriod.REPLACEMENT, ApplyStatus.BROKEN_APPLY);
 		Report report = attachReport(createDto.content(), applyReadDto.applyId());
 		return ApplyReportReadDto.of(applyReadDto, report);
 	}
@@ -99,17 +105,25 @@ public class ApplyService {
 	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
 	 * @throws InvalidApplyPeriodException "INVALID_APPLY_PERIOD"
 	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
+	 * @throws AllocateNotFoundException "ALLOCATE_NOT_FOUND"
+	 * @throws AlreadyAllocatedException "ALREADY_ALLOCATED"
 	 */
-	private ApplyReadDto processApplication(ApplyCreateDto createDto, ApplyPeriod period) {
+	private ApplyReadDto processApplication(ApplyCreateDto createDto, ApplyPeriod period, ApplyStatus applyStatus) {
 		ApplyForm activeApplyForm = applyFormService.getActiveApplyForm();
 		validateApplicationPeriod(activeApplyForm, period);
 
 		Student student = retrieveStudent(createDto);
-		if (countApplyWhenStatusIsApply(student, activeApplyForm) > 0) {
+		if (existsApplyByStatus(student, activeApplyForm, applyStatus)) {
 			throw new ApplyDuplicatedException();
 		}
 
-		Apply apply = applyRepository.save(createDto.toEntity(student, period));
+		if (period == ApplyPeriod.REPLACEMENT && !allocateRepository.existsByStudentAndApplyForm(student, activeApplyForm)) {
+			throw new AllocateNotFoundException();
+		} else if (period != ApplyPeriod.REPLACEMENT && allocateRepository.existsByStudentAndApplyForm(student, activeApplyForm)) {
+			throw new AlreadyAllocatedException();
+		}
+
+		Apply apply = applyRepository.save(createDto.toEntity(student, period, activeApplyForm));
 
 		return ApplyReadDto.fromEntity(apply, student);
 	}
@@ -193,10 +207,8 @@ public class ApplyService {
 	 * @throws ApplyDuplicatedException "APPLY_DUPLICATED"
 	 */
 	public Apply getApplyByStudentNumberAndApplyFormWhenStatusIsApply(Student student, ApplyForm applyForm) {
-		if (countApplyWhenStatusIsApply(student, applyForm) == 0)
+		if (!existsApplyByStatus(student, applyForm, ApplyStatus.APPLY))
 			throw new ApplyNotFoundException();
-		else if (countApplyWhenStatusIsApply(student, applyForm) > 1)
-			throw new ApplyDuplicatedException();
 
 		return applyRepository.findByStudentAndApplyFormAndStatus(student, applyForm, ApplyStatus.APPLY)
 			.orElseThrow(ApplyNotFoundException::new);
@@ -217,26 +229,32 @@ public class ApplyService {
 	}
 
 	/**
-	 * 특정 학생과 신청 폼에 대한 APPLY 상태의 신청 수를 셉니다.
+	 * 특정 학생과 신청 폼에 대한 APPLY 상태의 신청이 있는지 확인합니다.
 	 *
 	 * @param student 학생 엔티티
 	 * @param applyForm 신청 폼 엔티티
 	 * @return APPLY 상태의 신청 수
 	 */
-	private Long countApplyWhenStatusIsApply(Student student, ApplyForm applyForm) {
-		return applyRepository.countByStudentAndApplyFormAndStatus(student, applyForm, ApplyStatus.APPLY);
+	private boolean existsApplyByStatus(Student student, ApplyForm applyForm, ApplyStatus applyStatus) {
+		return applyRepository.existsByStudentAndApplyFormAndStatus(student, applyForm, applyStatus);
 	}
 
 	public List<ApplyReadDto> getAppliesByYearAndSemester(Integer year, Integer semester) {
 		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		return getApplies(applyForm);
+	}
+
+	public List<ApplyReadDto> getAppliesNow() {
+		ApplyForm applyForm = applyFormService.getActiveApplyForm();
+		return getApplies(applyForm);
+	}
+
+	private List<ApplyReadDto> getApplies(ApplyForm applyForm) {
 		List<Apply> applies = applyRepository.findAllByApplyForm(applyForm);
 		return applies.stream()
 			.map(apply -> ApplyReadDto.fromEntity(apply, apply.getStudent()))
 			.collect(Collectors.toList());
 	}
-
-
-	// Throw 포함 javadocs
 
 	/**
 	 * 특정 년도와 학기, 상태에 해당하는 신청을 조회합니다.
@@ -249,10 +267,80 @@ public class ApplyService {
 	 */
 	public List<ApplyReadDto> getAppliesByYearSemesterAndStatus(Integer year, Integer semester, ApplyStatus status) {
 		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		return getAppliesByStatus(applyForm, status);
+	}
+
+	/**
+	 * 특정 년도와 학기, 상태에 해당하는 신청을 조회합니다.
+	 *
+	 * @param status 신청 상태
+	 * @return 조회된 신청 리스트
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
+	public List<ApplyReadDto> getAppliesNowByStatus(ApplyStatus status) {
+		ApplyForm applyForm = applyFormService.getActiveApplyForm();
+		return getAppliesByStatus(applyForm, status);
+	}
+
+	private List<ApplyReadDto> getAppliesByStatus(ApplyForm applyForm, ApplyStatus status) {
 		List<Apply> applies = applyRepository.findAllByApplyFormAndStatus(applyForm, status);
 		return applies.stream()
 			.map(apply -> ApplyReadDto.fromEntity(apply, apply.getStudent()))
 			.collect(Collectors.toList());
+	}
+
+
+	/**
+	 * 특정 년도와 학기에 해당하는 신청과 신고 기록을 조회합니다.
+	 *
+	 * @param year 년도
+	 * @param semester 학기
+	 * @return 조회된 신청과 보고서 리스트
+	 * @throws ReportNotFoundException "REPORT_NOT_FOUND"
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 */
+	public List<ApplyReportReadDto> getAppliesAndReportsByYearAndSemester(Integer year, Integer semester) {
+		ApplyForm applyForm = applyFormService.getApplyFormByYearAndSemester(year, semester);
+		return getAppliesAndReportsByApplyForm(applyForm);
+	}
+
+
+	/**
+	 * 현재 활성화된 신청 폼에 해당하는 신청과 신고 기록을 조회합니다.
+	 *
+	 * @throws ReportNotFoundException "REPORT_NOT_FOUND"
+	 * @throws ApplyFormNotFoundException "APPLY_FORM_NOT_FOUND"
+	 * @return 조회된 신청과 보고서 리스트
+	 */
+	public List<ApplyReportReadDto> getAppliesAndReportsNow() {
+		ApplyForm applyForm = applyFormService.getActiveApplyForm();
+		return getAppliesAndReportsByApplyForm(applyForm);
+	}
+
+
+	private List<ApplyReportReadDto> getAppliesAndReportsByApplyForm(ApplyForm applyForm) {
+		List<Apply> applies = applyRepository.findAllByApplyFormAndStatus(applyForm, ApplyStatus.BROKEN_APPLY);
+		return applies.stream()
+			.map(apply -> {
+				Report report = reportService.getReportByApply(apply);
+				return ApplyReportReadDto.of(ApplyReadDto.fromEntity(apply, apply.getStudent()), report);
+			})
+			.collect(Collectors.toList());
+	}
+
+
+	@Transactional
+	public ApplyStatus updateReportStatus(ReportStatusUpdateDto updateDto) {
+		Apply apply = getApplyById(updateDto.reportId());
+		if (apply.getStatus() != ApplyStatus.BROKEN_APPLY)
+			throw new ApplyNotFoundException();
+
+		apply.updateStatus(
+			updateDto.isApproved() ? ApplyStatus.APPROVE : ApplyStatus.REJECT
+		);
+		applyRepository.save(apply);
+
+		return apply.getStatus();
 	}
 
 	/**
@@ -335,6 +423,11 @@ public class ApplyService {
 
 	public Apply getApplyById(Long applyId) {
 		return applyRepository.findById(applyId)
+			.orElseThrow(ApplyNotFoundException::new);
+	}
+
+	public Apply getApplyByIdWithStudent(Long applyId) {
+		return applyRepository.findByIdWithStudent(applyId)
 			.orElseThrow(ApplyNotFoundException::new);
 	}
 }

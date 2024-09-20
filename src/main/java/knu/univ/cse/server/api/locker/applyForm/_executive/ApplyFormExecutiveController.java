@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormCreateDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormReadDto;
 import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
@@ -42,7 +43,7 @@ public class ApplyFormExecutiveController {
 		@ApiResponse(responseCode = "409", description = "신청 폼이 이미 존재함 (code: APPLY_FORM_DUPLICATED)")
 	})
 	public ResponseEntity<ApiSuccessResult<ApplyFormReadDto>> createForm(
-		@RequestBody ApplyFormCreateDto requestBody
+		@Valid @RequestBody ApplyFormCreateDto requestBody
 	) {
 		ApplyFormReadDto responseBody = applyFormService.createApplyForm(requestBody);
 		return ResponseEntity

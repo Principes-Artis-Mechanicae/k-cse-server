@@ -18,12 +18,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report {
 	@Id
-	@Column(name = "apply_form_id")
+	@Column(name = "apply_id")
 	private Long id;
 
 	@MapsId
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "apply_form_id")
+	@JoinColumn(name = "apply_id")
 	private Apply apply;
 
 	private String content;

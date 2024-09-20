@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import knu.univ.cse.server.api.locker.allocate.dto.AllocateReadDto;
+import knu.univ.cse.server.api.locker.apply.dto.ReportStatusUpdateDto;
 import knu.univ.cse.server.domain.exception.locker.LockerFullNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.LockerNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.allocate.AllocateDuplicatedException;
@@ -69,6 +70,9 @@ public class AllocateService {
 		// 4. 학생에게 부여할 사물함을 찾고 고장 및 유효성 검사를 한다.
 		Locker targetLocker = lockerService.getLockerByLockerName(lockerName, applyForm);
 
+		// 이미 할당된 사물함이 있는 경우, 기존 할당을 삭제한다.
+		deleteAllocate(student, applyForm);
+
 		// 5. Allocate 객체를 생성하고 저장한다.
 		Allocate allocate = Allocate.builder()
 			.applyForm(applyForm)
@@ -110,6 +114,53 @@ public class AllocateService {
 
 		// 4. 학생에게 부여할 랜덤 사물함을 찾고 고장 및 유효성 검사를 한다.
 		Locker targetLocker = lockerService.getRandomLocker(targetApply);
+
+		// 이미 할당된 사물함이 있는 경우, 기존 할당을 삭제한다.
+		deleteAllocate(student, applyForm);
+
+		// 5. Allocate 객체를 생성하고 저장한다.
+		Allocate allocate = Allocate.builder()
+			.applyForm(applyForm)
+			.student(student)
+			.locker(targetLocker)
+			.apply(targetApply)
+			.build();
+
+		allocateRepository.save(allocate);
+
+		// 6. 신청 상태를 승인으로 변경한다.
+		applyService.updateApplyStatus(targetApply, ApplyStatus.APPROVE);
+
+		// 7. AllocateReadDto 를 반환한다.
+		return AllocateReadDto.fromEntity(student, targetApply, applyForm, targetLocker);
+	}
+
+	/**
+	 * 고장 신고 난 학생에게 랜덤 사물함을 할당합니다.
+	 *
+	 * @param requestBody 신고 ID를 포함한 DTO
+	 * @return 할당된 사물함의 DTO
+	 * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
+	 * @throws ApplyNotFoundException "APPLY_NOT_FOUND"
+	 * @throws LockerFullNotFoundException "LOCKER_FULL_NOT_FOUND"
+	 * @throws AllocateDuplicatedException "ALLOCATE_DUPLICATED"
+	 */
+	@Transactional(isolation = Isolation.SERIALIZABLE)
+	public AllocateReadDto allocateRandomLockerWhenReport(ReportStatusUpdateDto requestBody) {
+		// 1. 신고 ID로 신청을 찾는다.
+		Apply targetApply = applyService.getApplyByIdWithStudent(requestBody.reportId());
+
+		// 2. 학생을 찾는다.
+		Student student = targetApply.getStudent();
+
+		// 3. 현재 활성화된 신청폼을 찾는다.
+		ApplyForm applyForm = applyFormService.getActiveApplyForm();
+
+		// 4. 학생에게 부여할 랜덤 사물함을 찾고 고장 및 유효성 검사를 한다.
+		Locker targetLocker = lockerService.getRandomLocker(targetApply);
+
+		// 이미 할당된 사물함이 있는 경우, 기존 할당을 삭제한다.
+		deleteAllocate(student, applyForm);
 
 		// 5. Allocate 객체를 생성하고 저장한다.
 		Allocate allocate = Allocate.builder()
@@ -161,17 +212,20 @@ public class AllocateService {
 		}
 
 		// 4. 가중치가 높은 순으로 정렬
-		applyWithWeights.sort(Comparator.comparingInt(ApplyWithWeight::getWeight).reversed());
+		applyWithWeights.sort(Comparator.comparingInt(ApplyWithWeight::weight).reversed());
 
 		// 5. 정렬된 신청 리스트로부터 AllocateReadDto 리스트 생성
 		List<AllocateReadDto> allocateReadDtos = new ArrayList<>();
 
 		for (ApplyWithWeight applyWithWeight : applyWithWeights) {
-			Apply apply = applyWithWeight.getApply();
+			Apply apply = applyWithWeight.apply();
 
 			try {
 				// 5.1. 학생에게 부여할 랜덤 사물함을 찾고 고장 및 유효성 검사를 한다.
 				Locker targetLocker = lockerService.getRandomLocker(apply);
+
+				// 이미 할당된 사물함이 있는 경우, 기존 할당을 삭제한다.
+				deleteAllocate(apply.getStudent(), applyForm);
 
 				// 5.2. Allocate 객체를 생성하고 저장한다.
 				Allocate allocate = Allocate.builder()
@@ -201,15 +255,14 @@ public class AllocateService {
 	/**
 	 * 신청과 가중치를 함께 저장하기 위한 내부 클래스
 	 */
-	@Getter
-	private static class ApplyWithWeight {
-		private final Apply apply;
-		private final int weight;
+	private record ApplyWithWeight(Apply apply, int weight) { }
 
-		public ApplyWithWeight(Apply apply, int weight) {
-			this.apply = apply;
-			this.weight = weight;
+
+	@Transactional(isolation = Isolation.SERIALIZABLE)
+	public void deleteAllocate(Student student, ApplyForm applyForm) {
+		if (allocateRepository.existsByStudentAndApplyForm(student, applyForm)) {
+			allocateRepository.deleteByStudentAndApplyForm(student, applyForm);
 		}
-
 	}
+
 }
