@@ -1,11 +1,8 @@
 package knu.univ.cse.server.domain.service.locker.report;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import knu.univ.cse.server.api.locker.apply.dto.ApplyReportReadDto;
 import knu.univ.cse.server.domain.exception.locker.report.ReportNotFoundException;
 import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.report.Report;

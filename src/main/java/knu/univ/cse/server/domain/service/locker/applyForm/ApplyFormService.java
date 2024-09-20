@@ -14,7 +14,6 @@ import knu.univ.cse.server.api.locker.applyForm.dto.ApplyFormUpdateDto;
 import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormDuplicatedException;
 import knu.univ.cse.server.domain.exception.locker.applyForm.ApplyFormNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.applyForm.InvalidApplyFormDateException;
-import knu.univ.cse.server.domain.model.locker.apply.Apply;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyForm;
 import knu.univ.cse.server.domain.model.locker.applyForm.ApplyFormStatus;
 import knu.univ.cse.server.domain.persistence.ApplyFormRepository;

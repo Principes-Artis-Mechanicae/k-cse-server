@@ -13,6 +13,7 @@ import knu.univ.cse.server.api.locker.apply.dto.ReportStatusUpdateDto;
 import knu.univ.cse.server.domain.exception.locker.LockerFullNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.LockerNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.allocate.AllocateDuplicatedException;
+import knu.univ.cse.server.domain.exception.locker.allocate.AllocateNotFoundException;
 import knu.univ.cse.server.domain.exception.locker.apply.ApplyNotFoundException;
 import knu.univ.cse.server.domain.exception.student.StudentNotFoundException;
 import knu.univ.cse.server.domain.model.locker.Locker;
@@ -27,7 +28,6 @@ import knu.univ.cse.server.domain.service.locker.apply.ApplyService;
 import knu.univ.cse.server.domain.service.locker.applyForm.ApplyFormService;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.domain.service.student.dues.DuesService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -265,4 +265,12 @@ public class AllocateService {
 		}
 	}
 
+	public AllocateReadDto getAllocateForm(String studentNumber) {
+		Student student = studentService.findStudentByStudentNumber(studentNumber);
+		ApplyForm applyForm = applyFormService.getActiveApplyForm();
+		Allocate allocate = allocateRepository.findByStudentAndApplyForm(student, applyForm)
+			.orElseThrow(AllocateNotFoundException::new);
+
+		return AllocateReadDto.fromEntity(student, allocate.getApply(), applyForm, allocate.getLocker());
+	}
 }

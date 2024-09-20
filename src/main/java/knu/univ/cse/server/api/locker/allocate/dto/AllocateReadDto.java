@@ -12,16 +12,18 @@ import lombok.Builder;
 @Builder
 public record AllocateReadDto(
 	String studentName, String studentNumber,
-	String LockerName, LockerFloor floor, Integer height,
+	String lockerName, LockerFloor floor, Integer height, String pw, Boolean broken,
 	ApplyReadDto apply, ApplyFormReadDto applyForm
 ) {
 	public static AllocateReadDto fromEntity(Student student, Apply apply, ApplyForm applyForm, Locker locker) {
 		return AllocateReadDto.builder()
 			.studentName(student.getStudentName())
 			.studentNumber(student.getStudentNumber())
-			.LockerName(locker.getLockerName())
+			.lockerName(locker.getLockerName())
 			.floor(locker.getFloor())
 			.height(locker.getHeight())
+			.pw(locker.getPw())
+			.broken(locker.getBroken())
 			.apply(ApplyReadDto.fromEntity(apply, student))
 			.applyForm(ApplyFormReadDto.fromEntity(applyForm))
 			.build();
