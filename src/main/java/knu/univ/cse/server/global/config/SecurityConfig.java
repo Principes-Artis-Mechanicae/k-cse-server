@@ -72,6 +72,9 @@ public class SecurityConfig {
 			"https://knucse.site",
 			"https://locker.knucse.site",
 			"https://api.knucse.site",
+			"http://knucse.site",
+			"http://locker.knucse.site",
+			"http://api.knucse.site",
 			"http://localhost:5173"
 		));
 		configuration.setAllowedMethods(Arrays.asList(
