@@ -16,9 +16,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Getter
+@Getter @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "student")
 public class Student {
