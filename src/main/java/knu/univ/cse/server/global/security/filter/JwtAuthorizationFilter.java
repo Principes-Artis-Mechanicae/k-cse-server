@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import knu.univ.cse.server.domain.model.student.Role;
 import knu.univ.cse.server.domain.service.student.StudentService;
 import knu.univ.cse.server.global.jwt.provider.JwtTokenValidator;
 import knu.univ.cse.server.global.security.details.PrincipalDetails;
@@ -42,6 +43,9 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
                 Authentication authentication = jwtTokenValidator.getAuthentication(token, studentService);
                 log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getOAuthUserInfo().getEmail());
                 log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getStudent().getRole());
+                Role role = studentService.findStudentByStudentNumber(((PrincipalDetails) authentication.getPrincipal()).getStudent().getStudentNumber()).getRole();
+                log.info("Role: {}", role);
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
                 // Log the exception and proceed without setting authentication
