@@ -36,16 +36,10 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
         }
 
         String token = JwtTokenValidator.resolveToken(servletRequest);
-        log.info("Token: {}", token);
         if (token != null && jwtTokenValidator.validateToken(token)) {
             try {
-                log.info("Token is valid");
                 Authentication authentication = jwtTokenValidator.getAuthentication(token, studentService);
-                log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getOAuthUserInfo().getEmail());
-                log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getStudent().getRole());
                 Role role = studentService.findStudentByStudentNumber(((PrincipalDetails) authentication.getPrincipal()).getStudent().getStudentNumber()).getRole();
-                log.info("Role: {}", role);
-                log.info("Role: {}", role);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
