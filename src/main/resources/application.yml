@@ -34,18 +34,6 @@ spring:
             scope: email, profile
 
 app:
-  cors:
-    allowed-origins:
-      - ${CORS_ALLOWED_ORIGINS}
-    allowed-methods:
-      - "GET"
-      - "POST"
-      - "PUT"
-      - "PATCH"
-      - "DELETE"
-      - "OPTIONS"
-    allow-credentials: true
-
   oauth2:
 #    redirect-uri: "http://localhost:39253/login/success"
     redirect-uri: ${OAUTH2_REDIRECT_URI}

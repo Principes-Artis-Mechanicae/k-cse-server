@@ -1,9 +1,11 @@
 package knu.univ.cse.server.global.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,7 +34,6 @@ public class SecurityConfig {
 	private final StudentService studentService;
 	private final PrincipalOauth2UserService principalOauth2UserService;
 	private final Oauth2SuccessHandler oauth2SuccessHandler;
-	private final CorsProperties corsProperties;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(
@@ -67,14 +68,23 @@ public class SecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(corsProperties.getAllowedOrigins());
-		configuration.setAllowedMethods(corsProperties.getAllowedMethods());
-		configuration.setAllowCredentials(corsProperties.isAllowCredentials());
-		configuration.setAllowedHeaders(List.of("*")); // You can make this configurable as well
-
+		configuration.setAllowedOrigins(Arrays.asList(
+			"https://knucse.site",
+			"https://locker.knucse.site",
+			"https://api.knucse.site",
+			"http://localhost:5173"
+		));
+		configuration.setAllowedMethods(Arrays.asList(
+			HttpMethod.GET.name(),
+			HttpMethod.POST.name(),
+			HttpMethod.PATCH.name(),
+			HttpMethod.PUT.name(),
+			HttpMethod.DELETE.name()
+		));
+		configuration.setAllowCredentials(true);
+		configuration.setAllowedHeaders(List.of("*"));
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
-
 		return source;
 	}
 }
