@@ -41,6 +41,7 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
                 log.info("Token is valid");
                 Authentication authentication = jwtTokenValidator.getAuthentication(token, studentService);
                 log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getOAuthUserInfo().getEmail());
+                log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getStudent().getRole());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
                 // Log the exception and proceed without setting authentication
