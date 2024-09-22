@@ -39,8 +39,6 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
         if (token != null && jwtTokenValidator.validateToken(token)) {
             try {
                 Authentication authentication = jwtTokenValidator.getAuthentication(token, studentService);
-                Role role = studentService.findStudentByStudentNumber(((PrincipalDetails) authentication.getPrincipal()).getStudent().getStudentNumber()).getRole();
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
                 // Log the exception and proceed without setting authentication
