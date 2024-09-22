@@ -51,7 +51,7 @@ public class PrincipalDetails implements OAuth2User {
 
     public static PrincipalDetails buildPrincipalDetails(StudentService studentService, OAuthUserInfo oAuthUserInfo, OAuth2User oAuth2User) {
         Student student = null;
-        if (studentService.isOAuth2UserInfoConnectedToStudent(oAuthUserInfo)) {
+        if (oAuthUserInfo.getStudent() != null) {
             student = studentService.findStudentByOAuth2UserInfo(oAuthUserInfo);
         }
 

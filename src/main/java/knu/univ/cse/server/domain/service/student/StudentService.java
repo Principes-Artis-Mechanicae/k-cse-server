@@ -36,16 +36,6 @@ public class StudentService {
     }
 
     /**
-     * 주어진 OAuth2 사용자 정보가 학생과 연결되어 있는지 확인합니다.
-     *
-     * @param oAuthUserInfo OAuth2 사용자 정보 엔티티
-     * @return 연결되어 있으면 true, 그렇지 않으면 false
-     */
-    public boolean isOAuth2UserInfoConnectedToStudent(OAuthUserInfo oAuthUserInfo) {
-        return studentRepository.existsById(oAuthUserInfo.getId());
-    }
-
-    /**
      * 이메일을 통해 OAuth2 사용자 정보를 조회합니다.
      *
      * @param email 조회할 이메일 주소

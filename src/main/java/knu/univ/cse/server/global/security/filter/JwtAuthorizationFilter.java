@@ -45,6 +45,7 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
                 log.info("Authentication: {}", ((PrincipalDetails) authentication.getPrincipal()).getStudent().getRole());
                 Role role = studentService.findStudentByStudentNumber(((PrincipalDetails) authentication.getPrincipal()).getStudent().getStudentNumber()).getRole();
                 log.info("Role: {}", role);
+                log.info("Role: {}", role);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
