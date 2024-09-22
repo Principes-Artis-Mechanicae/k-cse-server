@@ -83,7 +83,7 @@ echo ""
 # Run Docker Compose
 echo "---------------------------------"
 echo "deploy.sh: Starting Docker Compose..."
-sudo docker-compose --env-file "$ENV_FILE" up -d --build
+sudo docker compose --env-file "$ENV_FILE" up -d --build
 echo "deploy.sh: Docker Compose up and running."
 echo "---------------------------------"
 
