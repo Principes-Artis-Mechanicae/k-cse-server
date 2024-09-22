@@ -49,11 +49,8 @@ public class PrincipalDetails implements OAuth2User {
         return this.attributes;
     }
 
-    public static PrincipalDetails buildPrincipalDetails(StudentService studentService, OAuthUserInfo oAuthUserInfo, OAuth2User oAuth2User) {
-        Student student = null;
-        if (oAuthUserInfo.getStudent() != null) {
-            student = studentService.findStudentByOAuth2UserInfo(oAuthUserInfo);
-        }
+    public static PrincipalDetails buildPrincipalDetails(OAuthUserInfo oAuthUserInfo, OAuth2User oAuth2User) {
+        Student student = oAuthUserInfo.getStudent();
 
         return PrincipalDetails.builder()
             .student(student)

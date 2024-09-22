@@ -57,7 +57,7 @@ public class JwtTokenValidator {
 				.build();
 		}
 
-		PrincipalDetails principalDetails = PrincipalDetails.buildPrincipalDetails(studentService, oAuthUserInfo, null);
+		PrincipalDetails principalDetails = PrincipalDetails.buildPrincipalDetails(oAuthUserInfo, null);
 		return new UsernamePasswordAuthenticationToken(principalDetails, "", authorities);
 	}
 

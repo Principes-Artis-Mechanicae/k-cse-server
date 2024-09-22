@@ -48,18 +48,6 @@ public class StudentService {
     }
 
     /**
-     * OAuth2 사용자 정보를 통해 학생을 조회합니다.
-     *
-     * @param oAuthUserInfo OAuth2 사용자 정보 엔티티
-     * @return 해당 OAuth2 사용자 정보에 연결된 학생 엔티티
-     * @throws StudentNotFoundException "STUDENT_NOT_FOUND"
-     */
-    public Student findStudentByOAuth2UserInfo(OAuthUserInfo oAuthUserInfo) {
-        return studentRepository.findStudentById(oAuthUserInfo.getId())
-            .orElseThrow(StudentNotFoundException::new);
-    }
-
-    /**
      * 학생 이름과 학번을 통해 학생을 조회합니다.
      *
      * @param studentName 학생 이름
@@ -83,7 +71,4 @@ public class StudentService {
         return studentRepository.findByStudentNumber(studentNumber)
             .orElseThrow(StudentNotFoundException::new);
     }
-
-
-
 }
