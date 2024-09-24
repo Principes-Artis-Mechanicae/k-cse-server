@@ -62,11 +62,11 @@ public class LockerService {
 	 */
 	@Transactional(isolation = Isolation.REPEATABLE_READ)
 	public List<Locker> getLockerByApplyWithoutAllocate(Apply apply, ApplyForm applyForm) {
-		List<Integer> firstLockerHeight = apply.getFirstHeight().getLockerHeight();
+		List<Integer> firstLockerHeight = apply.getFirstHeight().getLockerHeight(apply.getFirstFloor());
 		List<Locker> firstLockers = lockerRepository.findAvailableLockers(apply.getFirstFloor(), firstLockerHeight, applyForm);
 		if (!firstLockers.isEmpty()) return firstLockers;
 
-		List<Integer> secondLockerHeight = apply.getSecondHeight().getLockerHeight();
+		List<Integer> secondLockerHeight = apply.getSecondHeight().getLockerHeight(apply.getSecondFloor());
 		List<Locker> secondLockers = lockerRepository.findAvailableLockers(apply.getSecondFloor(), secondLockerHeight, applyForm);
 		if (!secondLockers.isEmpty()) return secondLockers;
 
