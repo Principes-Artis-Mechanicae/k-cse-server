@@ -37,6 +37,8 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 필요한 정보를 쿼리 파라미터로 추가
         redirectUrl += "?isConnectedToStudent=" + isConnectedToStudent;
 
+        redirectUrl += "&accessToken=" + accessToken.token();
+
         // 리다이렉트 수행
         response.sendRedirect(redirectUrl);
 
