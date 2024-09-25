@@ -1,5 +1,6 @@
 package knu.univ.cse.server.domain.service.student;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -70,5 +71,9 @@ public class StudentService {
     public Student findStudentByStudentNumber(String studentNumber) {
         return studentRepository.findByStudentNumber(studentNumber)
             .orElseThrow(StudentNotFoundException::new);
+    }
+
+    public List<Student> findAllStudents() {
+        return studentRepository.findAll();
     }
 }
