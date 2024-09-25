@@ -17,4 +17,5 @@ public interface AllocateRepository extends JpaRepository<Allocate, Long> {
 
 	@EntityGraph(attributePaths = {"student", "locker", "apply", "applyForm"})
 	Optional<Allocate> findByStudentAndApplyForm(Student student, ApplyForm applyForm);
+	List<Allocate> findByApplyFormAndStudentIn(ApplyForm applyForm, List<Student> students);
 }

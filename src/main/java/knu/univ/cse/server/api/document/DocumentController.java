@@ -1,6 +1,7 @@
 package knu.univ.cse.server.api.document;
 
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,7 @@ public class DocumentController {
 	private final DocumentService documentService;
 
 	@GetMapping("/download/csv")
-	public ResponseEntity<String> downloadAllocationsCsv() {
+	public ResponseEntity<byte[]> downloadAllocationsCsv() {
 		try {
 			List<AllocateReadDto> allocations = documentService.getAllStudentAllocateForm();
 
@@ -48,7 +49,7 @@ public class DocumentController {
 			// Write data rows
 			for (AllocateReadDto dto : allocations) {
 				String[] row = {
-					dto.studentName(),
+					dto.studentName(), // 또는 dto.studentName() depending on the DTO
 					dto.studentNumber(),
 					dto.lockerName(),
 					dto.floor().toString(),
@@ -63,7 +64,7 @@ public class DocumentController {
 
 			csvWriter.close();
 
-			String csvContent = stringWriter.toString();
+			byte[] csvBytes = stringWriter.toString().getBytes(StandardCharsets.UTF_8);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=allocations.csv");
@@ -72,10 +73,11 @@ public class DocumentController {
 			return ResponseEntity
 				.ok()
 				.headers(headers)
-				.body(csvContent);
+				.body(csvBytes);
 		} catch (Exception e) {
-			// Handle exceptions appropriately
-			return ResponseEntity.status(500).body("An error occurred while generating the CSV.");
+			// 로깅 추가
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("An error occurred while generating the CSV.".getBytes(StandardCharsets.UTF_8));
 		}
 	}
 }

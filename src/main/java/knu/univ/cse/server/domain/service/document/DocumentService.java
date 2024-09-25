@@ -2,6 +2,8 @@ package knu.univ.cse.server.domain.service.document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +27,22 @@ public class DocumentService {
 	private final AllocateRepository allocateRepository;
 
 	public List<AllocateReadDto> getAllStudentAllocateForm() {
+		// 모든 학생을 한 번에 조회
 		List<Student> students = studentService.findAllStudents();
-		List<AllocateReadDto> allocateReadDtos = new ArrayList<>();
 
-		for (Student student : students) {
-			ApplyForm applyForm = applyFormService.getActiveApplyForm();
-			Allocate allocate = allocateRepository.findByStudentAndApplyForm(student, applyForm)
-				.orElseThrow(AllocateNotFoundException::new);
-			allocateReadDtos.add(AllocateReadDto.fromEntity(student, allocate.getApply(), applyForm, allocate.getLocker()));
-		}
+		// 활성화된 ApplyForm을 루프 외부에서 한 번만 조회
+		ApplyForm applyForm = applyFormService.getActiveApplyForm();
 
-		return allocateReadDtos;
+		// 학생 리스트로부터 Allocate를 한 번에 조회
+		List<Allocate> allocates = allocateRepository.findByApplyFormAndStudentIn(applyForm, students);
+
+		// Allocate를 DTO로 변환하여 반환
+		return allocates.stream()
+			.map(allocate -> AllocateReadDto.fromEntity(
+				allocate.getStudent(),
+				allocate.getApply(),
+				applyForm,
+				allocate.getLocker()))
+			.collect(Collectors.toList());
 	}
 }
