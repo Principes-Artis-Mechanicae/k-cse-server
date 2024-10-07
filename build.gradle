@@ -4,7 +4,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.5'
 }
 
-group = 'knu.univ'
+group = 'knu.univ.cse.server'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -23,18 +23,56 @@ repositories {
 	mavenCentral()
 }
 
+test {
+	testLogging {
+		events "started", "passed", "skipped", "failed"
+		exceptionFormat "full"
+		showStandardStreams = true
+
+		afterTest { descriptor, result ->
+			def testResult = result.resultType
+			if (testResult == TestResult.ResultType.SUCCESS) {
+				println "\u001B[32m✔ 테스트 성공: ${descriptor.parent.displayName} > ${descriptor.displayName}\u001B[0m"
+			} else if (testResult == TestResult.ResultType.FAILURE) {
+				println "\u001B[31m✖ 테스트 실패: ${descriptor.parent.displayName} > ${descriptor.displayName}\u001B[0m"
+			} else if (testResult == TestResult.ResultType.SKIPPED) {
+				println "\u001B[33m- 테스트 스킵됨: ${descriptor.parent.displayName} > ${descriptor.displayName}\u001B[0m"
+			}
+		}
+	}
+}
+
 dependencies {
+	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// JSON Web Token (JWT)
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// Database
+	implementation 'com.mysql:mysql-connector-j'
+
+	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Api Documentation
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+	// CSV
+	implementation 'com.opencsv:opencsv:5.7.1'
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
